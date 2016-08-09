@@ -80,17 +80,78 @@ static inline void d3d9_free(d3d9_info &info)
 		DestroyWindow(info.hwnd);
 }
 
+#ifdef _WIN64
+
+#define CMP_SIZE 21
+
+static const uint8_t mask[CMP_SIZE] =
+{0xF8, 0xFF, 0xC0, 0x00, 0x00, 0x00, 0x00,
+ 0xFF, 0xC0, 0x00, 0x00, 0x00, 0x00,
+ 0xFF, 0x00,
+ 0xF8, 0xF8, 0x00, 0x00, 0x00, 0x00};
+
+static const uint8_t mask_cmp[CMP_SIZE] =
+{0x48, 0x8B, 0x80, 0x00, 0x00, 0x00, 0x00,
+ 0x39, 0x80, 0x00, 0x00, 0x00, 0x00,
+ 0x75, 0x00,
+ 0x40, 0xB8, 0x00, 0x00, 0x00, 0x00};
+#else
+
+#define CMP_SIZE 19
+
+static const uint8_t mask[CMP_SIZE] =
+{0xFF, 0xC0, 0x00, 0x00, 0x00, 0x00,
+ 0xFF, 0xC0, 0x00, 0x00, 0x00, 0x00,
+ 0xFF, 0x00,
+ 0xFF, 0x00, 0x00, 0x00, 0x00};
+
+static const uint8_t mask_cmp[CMP_SIZE] =
+{0x8B, 0x80, 0x00, 0x00, 0x00, 0x00,
+ 0x39, 0x80, 0x00, 0x00, 0x00, 0x00,
+ 0x75, 0x00,
+ 0x68, 0x00, 0x00, 0x00, 0x00};
+#endif
+
+#define MAX_FUNC_SCAN_BYTES 200
+
+static inline bool pattern_matches(uint8_t *byte)
+{
+	for (size_t i = 0; i < CMP_SIZE; i++) {
+		if ((byte[i] & mask[i]) != mask_cmp[i])
+			return false;
+	}
+
+	return true;
+}
+
 void get_d3d9_offsets(struct d3d9_offsets *offsets)
 {
 	d3d9_info info    = {};
 	bool      success = d3d9_init(info);
 
 	if (success) {
+		uint8_t **vt = *(uint8_t***)info.device;
+		uint8_t *crr = vt[125];
+
 		offsets->present = vtable_offset(info.module, info.device, 17);
 		offsets->present_ex = vtable_offset(info.module, info.device,
 				121);
 		offsets->present_swap = vtable_offset(info.module, info.swap,
 				3);
+
+		for (size_t i = 0; i < MAX_FUNC_SCAN_BYTES; i++) {
+			if (pattern_matches(&crr[i])) {
+#define get_offset(x) *(uint32_t*)&crr[i + x]
+#ifdef _WIN64
+				offsets->d3d9_clsoff = get_offset(3);
+				offsets->is_d3d9ex_clsoff = get_offset(9);
+#else
+				offsets->d3d9_clsoff = get_offset(2);
+				offsets->is_d3d9ex_clsoff = get_offset(8);
+#endif
+				break;
+			}
+		}
 	}
 
 	d3d9_free(info);
