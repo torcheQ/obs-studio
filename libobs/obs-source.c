@@ -98,6 +98,21 @@ const char *obs_source_get_display_name(const char *id)
 	return (info != NULL) ? info->get_name(info->type_data) : NULL;
 }
 
+const char *obs_source_get_icon(const char *id)
+{
+	const struct obs_source_info *info = get_source_info(id);
+
+	if (info == NULL) {
+		return NULL;
+	}
+
+	if (info->get_icon == NULL) {
+		return NULL;
+	}
+
+	return info->get_icon(info->type_data);
+}
+
 static void allocate_audio_output_buffer(struct obs_source *source)
 {
 	size_t size = sizeof(float) *

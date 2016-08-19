@@ -95,6 +95,16 @@ static const char *syphon_get_name(void *unused)
 	return obs_module_text("Syphon");
 }
 
+static const char *syphon_get_icon(void *unused)
+{
+	UNUSED_PARAMETER(unused);
+	char *path = obs_module_file("icon.png");
+	if (!path)
+		return NULL;
+
+	return path;
+}
+
 static void stop_client(syphon_t s)
 {
 	obs_enter_graphics();
@@ -1278,6 +1288,7 @@ struct obs_source_info syphon_info = {
 	.output_flags   = OBS_SOURCE_VIDEO | OBS_SOURCE_CUSTOM_DRAW |
 	                  OBS_SOURCE_DO_NOT_DUPLICATE,
 	.get_name       = syphon_get_name,
+	.get_icon       = syphon_get_icon,
 	.create         = syphon_create,
 	.destroy        = syphon_destroy,
 	.video_render   = syphon_video_render,

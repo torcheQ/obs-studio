@@ -38,6 +38,7 @@
 #include "window-basic-settings.hpp"
 #include "window-namedialog.hpp"
 #include "window-basic-source-select.hpp"
+#include "window-basic-add-source.hpp"
 #include "window-basic-main.hpp"
 #include "window-basic-main-outputs.hpp"
 #include "window-basic-properties.hpp"
@@ -3072,8 +3073,9 @@ QMenu *OBSBasic::CreateAddSourcePopupMenu()
 
 	QMenu *popup = new QMenu(QTStr("Add"), this);
 
-	auto addSource = [this, popup] (const char *type, const char *name) {
+	auto addSource = [this, popup] (const char *type, const char *name, const char *icon) {
 		QAction *popupItem = new QAction(QT_UTF8(name), this);
+		popupItem->setIcon(QIcon(icon));
 		popupItem->setData(QT_UTF8(type));
 		connect(popupItem, SIGNAL(triggered(bool)),
 				this, SLOT(AddSourceFromAction()));
@@ -3082,12 +3084,13 @@ QMenu *OBSBasic::CreateAddSourcePopupMenu()
 
 	while (obs_enum_input_types(idx++, &type)) {
 		const char *name = obs_source_get_display_name(type);
+		const char *icon = obs_source_get_icon(type);
 
-		addSource(type, name);
+		addSource(type, name, icon);
 		foundValues = true;
 	}
 
-	addSource("scene", Str("Basic.Scene"));
+	addSource("scene", Str("Basic.Scene"), "");
 
 	if (!foundValues) {
 		delete popup;
@@ -3116,9 +3119,11 @@ void OBSBasic::AddSourcePopupMenu(const QPoint &pos)
 		return;
 	}
 
-	QPointer<QMenu> popup = CreateAddSourcePopupMenu();
+	OBSBasicAddSource addSource(this);
+	addSource.exec();
+	/*QPointer<QMenu> popup = CreateAddSourcePopupMenu();
 	if (popup)
-		popup->exec(pos);
+		popup->exec(pos);*/
 }
 
 void OBSBasic::on_actionAddSource_triggered()

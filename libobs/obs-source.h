@@ -154,6 +154,8 @@ struct obs_source_info {
 	 */
 	const char *(*get_name)(void *type_data);
 
+	const char *(*get_icon)(void *type_data);
+
 	/**
 	 * Creates the source data for the source
 	 *
