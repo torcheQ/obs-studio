@@ -1565,6 +1565,13 @@ void obs_sceneitem_set_bounds(obs_sceneitem_t *item, const struct vec2 *bounds)
 	}
 }
 
+void obs_sceneitem_set_size(obs_sceneitem_t *item, const struct vec2 *size)
+{
+	if (item) {
+		source_set_size(item->source, size->x, size->y);
+	}
+}
+
 void obs_sceneitem_get_pos(const obs_sceneitem_t *item, struct vec2 *pos)
 {
 	if (item)

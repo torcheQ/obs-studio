@@ -59,6 +59,7 @@ static const char *source_signals[] = {
 	"void deactivate(ptr source)",
 	"void show(ptr source)",
 	"void hide(ptr source)",
+	"void set_size(prt source, int width, int height)",
 	"void mute(ptr source, bool muted)",
 	"void push_to_mute_changed(ptr source, bool enabled)",
 	"void push_to_mute_delay(ptr source, int delay)",
@@ -848,6 +849,13 @@ static void hide_source(obs_source_t *source)
 	if (source->context.data && source->info.hide)
 		source->info.hide(source->context.data);
 	obs_source_dosignal(source, "source_hide", "hide");
+}
+
+static void source_set_size(obs_source_t *source, uint32_t width, uint32_t height)
+{
+	if (source->context.data && source->info.set_size)
+		source->info.set_size(source->context.data, width, height);
+	obs_source_dosignal(source, "source_set_size", "set_size");
 }
 
 static void activate_tree(obs_source_t *parent, obs_source_t *child,

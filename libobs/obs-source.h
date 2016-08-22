@@ -182,6 +182,8 @@ struct obs_source_info {
 	/* ----------------------------------------------------------------- */
 	/* Optional implementation */
 
+	void (*set_size)(void *data, uint32_t width, uint32_t height);
+
 	/**
 	 * Gets the default settings for this source
 	 *

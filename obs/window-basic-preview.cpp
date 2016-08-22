@@ -9,6 +9,8 @@
 #include "window-basic-main.hpp"
 #include "obs-app.hpp"
 
+#import <iostream>
+
 #define HANDLE_RADIUS     4.0f
 #define HANDLE_SEL_RADIUS (HANDLE_RADIUS * 1.5f)
 
@@ -917,6 +919,12 @@ void OBSBasicPreview::StretchItem(const vec2 &pos)
 	vec2 size;
 	vec2_set(&size,br. x - tl.x, br.y - tl.y);
 
+	// TODO if responsive source
+	std::cout << size.x << "x" << size.y << std::endl;
+
+	obs_sceneitem_set_size(stretchItem, &size);
+
+	/*
 	if (boundsType != OBS_BOUNDS_NONE) {
 		if (shiftDown)
 			ClampAspect(tl, br, size, baseSize);
@@ -946,7 +954,7 @@ void OBSBasicPreview::StretchItem(const vec2 &pos)
 
 	vec2 newPos;
 	vec2_set(&newPos, std::round(pos3.x), std::round(pos3.y));
-	obs_sceneitem_set_pos(stretchItem, &newPos);
+	obs_sceneitem_set_pos(stretchItem, &newPos);*/
 }
 
 void OBSBasicPreview::mouseMoveEvent(QMouseEvent *event)
