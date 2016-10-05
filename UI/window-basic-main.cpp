@@ -38,6 +38,7 @@
 #include "window-basic-settings.hpp"
 #include "window-namedialog.hpp"
 #include "window-basic-source-select.hpp"
+#include "window-basic-add-source.hpp"
 #include "window-basic-main.hpp"
 #include "window-basic-main-outputs.hpp"
 #include "window-basic-properties.hpp"
@@ -3252,9 +3253,8 @@ void OBSBasic::AddSourcePopupMenu(const QPoint &pos)
 		return;
 	}
 
-	QPointer<QMenu> popup = CreateAddSourcePopupMenu();
-	if (popup)
-		popup->exec(pos);
+	OBSBasicAddSource addSource(this);
+	addSource.exec();
 }
 
 void OBSBasic::on_actionAddSource_triggered()

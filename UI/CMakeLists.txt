@@ -110,6 +110,7 @@ set(obs_SOURCES
 	window-basic-properties.cpp
 	window-basic-main-outputs.cpp
 	window-basic-source-select.cpp
+	window-basic-add-source.cpp
 	window-basic-main-scene-collections.cpp
 	window-basic-main-transitions.cpp
 	window-basic-main-dropfiles.cpp
@@ -154,6 +155,7 @@ set(obs_HEADERS
 	window-basic-properties.hpp
 	window-basic-main-outputs.hpp
 	window-basic-source-select.hpp
+	window-basic-add-source.hpp
 	window-license-agreement.hpp
 	window-basic-status-bar.hpp
 	window-basic-adv-audio.hpp
@@ -195,6 +197,7 @@ set(obs_UI
 	forms/OBSBasicFilters.ui
 	forms/OBSBasicSettings.ui
 	forms/OBSBasicSourceSelect.ui
+	forms/OBSBasicAddSource.ui
 	forms/OBSBasicInteraction.ui
 	forms/OBSRemux.ui)
 
