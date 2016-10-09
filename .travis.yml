@@ -1,0 +1,21 @@
+os: osx
+env:
+  matrix:
+  - CMAKE_PREFIX_PATH=/usr/local/opt/qt5/lib/cmake
+  global:
+  - secure: BNL2fdaIU/9nS5W7gRXAsDb+MylHKNalanRQcHJeaLjHbqVQ7ajMvhliUCIVn3IM5D9LtH/94o7GxRglp19eTwoPCxUWjAR0A6nSuyTbLQP4Hx79Wn48QohV4FbGSvT4uyzPYCGvSnhCDAh08yzDEZoMEHXlleBxfGyr8/cJJjA3wyh/ZhvhBFtPMSTICNrGjQTtdVdUISehJACgJUOCGGeEhEtK0KuxI83p0AZGOz+7lrnM56T39040VpuB1BOO4XpV94snX6rPCifI6iImz3wNpqfmbJy7kimfPt5E6xHetxgR/XXwxICttWqhsMm6tDzHAdfQ8wI9kgc5KNqi9NTenfdv68OtFiX0qAMrGkOA5w+cfg7kPycn3Ta13TB/kdv+ZS6qcuWzIiK3mjcU+SU6Zc6San7yQvkMnGUkySHCYytfc+X91A5byOt+uvxkak/7Ep6U1WXnJasj7uO5QLD3RfFlKA+c/YkdQkeJ+7hgv568q2oq9h8u6HTnqvcK5/MO+AKepSJMh8pmGVCnTcvZuhBwgjyeJgQ+6BYqQlV2tW349hOvkzCOQnQlHTqdsoWB72Md3jtni86PUAgHCHOz1KIKrtVlHBruaV9oNV9a41bP2Vy6KIRr9IrYMcsuRLfJ2nbTYX1kht2Yardaxeqx5JRlPLQSAvZL+oYGyEw=
+  - secure: bG4yMze+tooMHMzsrLx9MIvd9yak17S8aUn4TDDY1wKvDQ0M6SQ/rGrnEMpFRd9thjTaRck8JDOwa5ttH/SUtCBcAfx78am7rtb61xFiUI3/nIKq008SDtSc9C01DS/5cNG49nillEvQuQHRJwpT4DS59Da86wlS0rHsIRYMf9Y7ulW2L2wZbUeuKLDJ8MR9ehp4oafa9viE0cP/63pUXTxcBtVQPqsHjTGCUlBZbdodGFkZotCYnyJZP6/4C19eSNk8mSl/3ECSbPONNypBWo2PVF0bkUMoA8ict4msawGlvdfg+okrQL1PFZgUiSO//AcPvPFaucF8KqpZAzNhsY82C9W2v08ck3u0MIAWJ8ivXMagjLjWSrKr4awmYziCNyuqU5E/C/zTUKLVLsRvmh0+ljm4bPaE+ohYiLU6qMLnHGnrObD9+U6uOiRNR9gl+Ld7fD1kqcu2svtDdrPXUUSHWH4zs2eDXe8st3h387sTBNWApqOTtmsCVTqGr30ZnTZYIUi/ZXhdB2RUu0eRXtPoRqiqZPW/D2hxTWV67ziabX2D2+Xutu6Xi18uvz6aUjdZKixOWYEZi3pACEasKvoe5+Ep4mjjjVyCbHvi76/EpsztnMcF/tM3elLozJ1XWJ+zktmf8N+exTckVTJfX7NyObBcTVA5p5pDbajrois=
+language: cpp
+before_install: "./CI/install-dependencies-osx.sh"
+before_script: "./CI/before-script-osx.sh"
+script: cd ./build && make -j4 && cd -
+before_deploy: "./CI/before-deploy-osx.sh"
+deploy:
+  provider: s3
+  access_key_id: $AWS_ACCESS_KEY
+  secret_access_key: $AWS_SECRET_KEY
+  skip_cleanup: true
+  local_dir: nightly
+  bucket: obs-nightly
+  region: us-west-2
+  acl: public_read
