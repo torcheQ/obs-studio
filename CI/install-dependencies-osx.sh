@@ -1,7 +1,7 @@
 brew update
 
 #Base OBS Deps
-brew install ffmpeg x264 qt5 python3
+brew install ffmpeg x264 qt5 python
 
 # CEF Stuff
 cd ../
