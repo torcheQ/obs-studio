@@ -21,6 +21,9 @@ set(linux-decklink-sdk_SOURCES
 	)
 
 set(linux-decklink_HEADERS
+	../decklink-devices.hpp
+	../decklink-source.hpp
+	../decklink-output.hpp
 	../platform.hpp
 	../decklink.hpp
 	../decklink-device-instance.hpp

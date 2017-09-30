@@ -25,6 +25,9 @@ set(mac-decklink-sdk_SOURCES
 	)
 
 set(mac-decklink_HEADERS
+	../decklink-devices.hpp
+	../decklink-source.hpp
+	../decklink-output.hpp
 	../platform.hpp
 	../decklink.hpp
 	../decklink-device-instance.hpp
