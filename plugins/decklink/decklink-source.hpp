@@ -138,7 +138,7 @@ static bool decklink_device_changed(obs_properties_t *props,
 		obs_property_list_item_disable(modeList, 0, true);
 	} else {
 		const std::vector<DeckLinkDeviceMode*> &modes =
-				device->GetModes();
+				device->GetInputModes();
 
 		for (DeckLinkDeviceMode *mode : modes) {
 			obs_property_list_add_int(modeList,

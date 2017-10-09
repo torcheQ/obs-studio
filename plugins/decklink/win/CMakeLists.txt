@@ -19,6 +19,7 @@ set(win-decklink_HEADERS
 	../decklink-devices.hpp
 	../decklink-source.hpp
 	../decklink-output.hpp
+	../DecklinkOutput.hpp
 	../platform.hpp
 	../decklink.hpp
 	../decklink-device-instance.hpp
@@ -31,6 +32,7 @@ set(win-decklink_HEADERS
 
 set(win-decklink_SOURCES
 	../plugin-main.cpp
+	../DecklinkOutput.cpp
 	../decklink.cpp
 	../decklink-device-instance.cpp
 	../decklink-device-discovery.cpp

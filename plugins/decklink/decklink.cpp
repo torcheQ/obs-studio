@@ -81,7 +81,7 @@ bool DeckLink::Activate(DeckLinkDevice *device, long long modeId)
 	if (instance == nullptr)
 		return false;
 
-	DeckLinkDeviceMode *mode = GetDevice()->FindMode(modeId);
+	DeckLinkDeviceMode *mode = GetDevice()->FindInputMode(modeId);
 	if (mode == nullptr) {
 		instance = nullptr;
 		return false;

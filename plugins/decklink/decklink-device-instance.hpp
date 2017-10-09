@@ -1,6 +1,7 @@
 #pragma once
 
 #include "decklink-device.hpp"
+#include "../../libobs/media-io/video-scaler.h"
 
 class AudioRepacker;
 
@@ -17,12 +18,15 @@ protected:
 	video_colorspace        activeColorSpace = VIDEO_CS_DEFAULT;
 	video_range_type        colorRange = VIDEO_RANGE_DEFAULT;
 	ComPtr<IDeckLinkInput>  input;
+	ComPtr<IDeckLinkOutput> output;
 	volatile long           refCount = 1;
 	int64_t                 audioOffset = 0;
 	uint64_t                nextAudioTS = 0;
 	uint64_t                lastVideoTS = 0;
 	AudioRepacker           *audioRepacker = nullptr;
 	speaker_layout          channelFormat = SPEAKERS_STEREO;
+
+	video_data* conversion_video_data;
 
 	void FinalizeStream();
 	void SetupVideoFormat(DeckLinkDeviceMode *mode_);
@@ -52,6 +56,9 @@ public:
 	bool StartCapture(DeckLinkDeviceMode *mode);
 	bool StopCapture(void);
 
+	bool StartOutput();
+	bool StopOutput(void);
+
 	HRESULT STDMETHODCALLTYPE VideoInputFrameArrived(
 			IDeckLinkVideoInputFrame *videoFrame,
 			IDeckLinkAudioInputPacket *audioPacket);
@@ -63,4 +70,6 @@ public:
 	ULONG STDMETHODCALLTYPE AddRef(void);
 	HRESULT STDMETHODCALLTYPE QueryInterface(REFIID iid, LPVOID *ppv);
 	ULONG STDMETHODCALLTYPE Release(void);
+
+	void DisplayVideoFrame(video_scaler *scaler, video_data *frame);
 };
