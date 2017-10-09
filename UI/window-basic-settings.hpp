@@ -42,7 +42,7 @@ class OBSHotkeyWidget;
 #define VOLUME_METER_DECAY_SLOW        8.57
 
 class SilentUpdateCheckBox : public QCheckBox {
-	Q_OBJECT
+Q_OBJECT
 
 public slots:
 	void setCheckedSilently(bool checked)
@@ -54,7 +54,7 @@ public slots:
 };
 
 class SilentUpdateSpinBox : public QSpinBox {
-	Q_OBJECT
+Q_OBJECT
 
 public slots:
 	void setValueSilently(int val)
@@ -83,7 +83,7 @@ using OBSFFFormatDesc = std::unique_ptr<const ff_format_desc,
 		OBSFFDeleter>;
 
 class OBSBasicSettings : public QDialog {
-	Q_OBJECT
+Q_OBJECT
 
 private:
 	OBSBasic *main;
@@ -122,7 +122,7 @@ private:
 	QString curAdvRecordEncoder;
 
 	using AudioSource_t =
-		std::tuple<OBSWeakSource,
+	std::tuple<OBSWeakSource,
 			QPointer<QCheckBox>, QPointer<QSpinBox>,
 			QPointer<QCheckBox>, QPointer<QSpinBox>>;
 	std::vector<AudioSource_t> audioSources;
@@ -138,24 +138,24 @@ private:
 	uint32_t outputCY = 0;
 
 	void SaveCombo(QComboBox *widget, const char *section,
-			const char *value);
+				   const char *value);
 	void SaveComboData(QComboBox *widget, const char *section,
-			const char *value);
+					   const char *value);
 	void SaveCheckBox(QAbstractButton *widget, const char *section,
-			const char *value, bool invert = false);
+					  const char *value, bool invert = false);
 	void SaveEdit(QLineEdit *widget, const char *section,
-			const char *value);
+				  const char *value);
 	void SaveSpinBox(QSpinBox *widget, const char *section,
-			const char *value);
+					 const char *value);
 	void SaveFormat(QComboBox *combo);
 	void SaveEncoder(QComboBox *combo, const char *section,
-			const char *value);
+					 const char *value);
 
 	inline bool Changed() const
 	{
 		return generalChanged || outputsChanged || stream1Changed ||
-			audioChanged || videoChanged || advancedChanged ||
-			hotkeysChanged;
+			   audioChanged || videoChanged || advancedChanged ||
+			   hotkeysChanged;
 	}
 
 	inline void EnableApplyButton(bool en)
@@ -201,7 +201,7 @@ private:
 	void LoadSettings(bool changedOnly);
 
 	OBSPropertiesView *CreateEncoderPropertyView(const char *encoder,
-			const char *path, bool changed = false);
+												 const char *path, bool changed = false);
 
 	/* general */
 	void LoadLanguageList();
@@ -216,8 +216,8 @@ private:
 	void LoadAdvOutputFFmpegSettings();
 	void LoadAdvOutputAudioSettings();
 	void SetAdvOutputFFmpegEnablement(
-		ff_codec_type encoderType, bool enabled,
-		bool enableEncode = false);
+			ff_codec_type encoderType, bool enabled,
+			bool enableEncode = false);
 
 	/* audio */
 	void LoadListValues(QComboBox *widget, obs_property_t *prop, int index);

@@ -1,30 +1,22 @@
-#include "decklink.hpp"
-#include "decklink-device-discovery.hpp"
-#include "decklink-device-instance.hpp"
-#include "decklink-device-mode.hpp"
+#include "DecklinkInput.hpp"
 
 #include <util/threading.h>
 
-DeckLink::DeckLink(obs_source_t *source, DeckLinkDeviceDiscovery *discovery_) :
-	discovery(discovery_), source(source)
+DeckLinkInput::DeckLinkInput(obs_source_t *source, DeckLinkDeviceDiscovery *discovery_) :
+		DecklinkBase(discovery_), source(source)
 {
-	discovery->AddCallback(DeckLink::DevicesChanged, this);
+	discovery->AddCallback(DeckLinkInput::DevicesChanged, this);
 }
 
-DeckLink::~DeckLink(void)
+DeckLinkInput::~DeckLinkInput(void)
 {
-	discovery->RemoveCallback(DeckLink::DevicesChanged, this);
+	discovery->RemoveCallback(DeckLinkInput::DevicesChanged, this);
 	Deactivate();
 }
 
-DeckLinkDevice *DeckLink::GetDevice() const
+void DeckLinkInput::DevicesChanged(void *param, DeckLinkDevice *device, bool added)
 {
-	return instance ? instance->GetDevice() : nullptr;
-}
-
-void DeckLink::DevicesChanged(void *param, DeckLinkDevice *device, bool added)
-{
-	DeckLink *decklink = reinterpret_cast<DeckLink*>(param);
+	DeckLinkInput *decklink = reinterpret_cast<DeckLinkInput*>(param);
 	std::lock_guard<std::recursive_mutex> lock(decklink->deviceMutex);
 
 	obs_source_update_properties(decklink->source);
@@ -54,7 +46,7 @@ void DeckLink::DevicesChanged(void *param, DeckLinkDevice *device, bool added)
 	}
 }
 
-bool DeckLink::Activate(DeckLinkDevice *device, long long modeId)
+bool DeckLinkInput::Activate(DeckLinkDevice *device, long long modeId)
 {
 	std::lock_guard<std::recursive_mutex> lock(deviceMutex);
 	DeckLinkDevice *curDevice = GetDevice();
@@ -81,11 +73,18 @@ bool DeckLink::Activate(DeckLinkDevice *device, long long modeId)
 	if (instance == nullptr)
 		return false;
 
-	DeckLinkDeviceMode *mode = GetDevice()->FindMode(modeId);
+	if (curDevice == nullptr) {
+		LOG(LOG_ERROR, "Tried to activate an input without nullptr device.");
+		return false;
+	}
+
+	DeckLinkDeviceMode *mode = GetDevice()->FindInputMode(modeId);
 	if (mode == nullptr) {
 		instance = nullptr;
 		return false;
 	}
+
+	//instance->setOutputSize();
 
 	if (!instance->StartCapture(mode)) {
 		instance = nullptr;
@@ -97,7 +96,7 @@ bool DeckLink::Activate(DeckLinkDevice *device, long long modeId)
 	return true;
 }
 
-void DeckLink::Deactivate(void)
+void DeckLinkInput::Deactivate(void)
 {
 	std::lock_guard<std::recursive_mutex> lock(deviceMutex);
 	if (instance)
@@ -107,7 +106,7 @@ void DeckLink::Deactivate(void)
 	os_atomic_dec_long(&activateRefs);
 }
 
-void DeckLink::SaveSettings()
+void DeckLinkInput::SaveSettings()
 {
 	if (!instance)
 		return;
@@ -127,7 +126,7 @@ void DeckLink::SaveSettings()
 	obs_data_release(settings);
 }
 
-obs_source_t *DeckLink::GetSource(void) const
+obs_source_t *DeckLinkInput::GetSource(void) const
 {
 	return source;
 }

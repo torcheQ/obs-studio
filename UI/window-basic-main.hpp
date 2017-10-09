@@ -83,14 +83,14 @@ struct QuickTransition {
 
 	inline QuickTransition() {}
 	inline QuickTransition(OBSSource source_, int duration_, int id_)
-		: source   (source_),
-		  duration (duration_),
-		  id       (id_)
+			: source   (source_),
+			  duration (duration_),
+			  id       (id_)
 	{}
 };
 
 class OBSBasic : public OBSMainWindow {
-	Q_OBJECT
+Q_OBJECT
 
 	friend class OBSBasicPreview;
 	friend class OBSBasicStatusBar;
@@ -239,7 +239,7 @@ private:
 
 	void TempFileOutput(const char *path, int vBitrate, int aBitrate);
 	void TempStreamOutput(const char *url, const char *key,
-			int vBitrate, int aBitrate);
+						  int vBitrate, int aBitrate);
 
 	void CreateInteractionWindow(obs_source_t *source);
 	void CreatePropertiesWindow(obs_source_t *source);
@@ -250,8 +250,8 @@ private:
 
 	void Nudge(int dist, MoveDir dir);
 	void OpenProjector(obs_source_t *source, int monitor, bool window,
-			QString title = nullptr,
-			ProjectorType type = ProjectorType::Source);
+					   QString title = nullptr,
+					   ProjectorType type = ProjectorType::Source);
 
 	void GetAudioSourceFilters();
 	void GetAudioSourceProperties();
@@ -265,7 +265,7 @@ private:
 	void LoadProfile();
 	void ResetProfileData();
 	bool AddProfile(bool create_new, const char *title, const char *text,
-			const char *init_text = nullptr);
+					const char *init_text = nullptr);
 	void DeleteProfile(const char *profile_name, const char *profile_dir);
 	void RefreshProfiles();
 	void ChangeProfile();
@@ -276,7 +276,7 @@ private:
 	QListWidgetItem *GetTopSelectedSourceItem();
 
 	obs_hotkey_pair_id streamingHotkeys, recordingHotkeys,
-	                   replayBufHotkeys;
+			replayBufHotkeys;
 	obs_hotkey_id forceStreamingStopHotkey;
 
 	void InitDefaultTransitions();
@@ -314,7 +314,7 @@ private:
 	void SetPreviewProgramMode(bool enabled);
 	void ResizeProgram(uint32_t cx, uint32_t cy);
 	void SetCurrentScene(obs_scene_t *scene, bool force = false,
-			bool direct = false);
+						 bool direct = false);
 	static void RenderProgram(void *data, uint32_t cx, uint32_t cy);
 
 	std::vector<QuickTransition> quickTransitions;
@@ -366,15 +366,15 @@ private:
 
 	obs_data_array_t *SavePreviewProjectors();
 	void LoadSavedPreviewProjectors(
-		obs_data_array_t *savedPreviewProjectors);
+			obs_data_array_t *savedPreviewProjectors);
 
 	obs_data_array_t *SaveStudioProgramProjectors();
 	void LoadSavedStudioProgramProjectors(
-		obs_data_array_t *savedStudioProgramProjectors);
+			obs_data_array_t *savedStudioProgramProjectors);
 
 	obs_data_array_t *SaveMultiviewProjectors();
 	void LoadSavedMultiviewProjectors(
-		obs_data_array_t *savedMultiviewProjectors);
+			obs_data_array_t *savedMultiviewProjectors);
 
 public slots:
 	void StartStreaming();
@@ -408,11 +408,11 @@ public slots:
 
 	void SetTransition(OBSSource transition);
 	void TransitionToScene(OBSScene scene, bool force = false,
-			bool direct = false);
+						   bool direct = false);
 	void TransitionToScene(OBSSource scene, bool force = false,
-			bool direct = false, bool quickTransition = false);
+						   bool direct = false, bool quickTransition = false);
 	void SetCurrentScene(OBSSource scene, bool force = false,
-			bool direct = false);
+						 bool direct = false);
 
 private slots:
 	void AddSceneItem(OBSSceneItem item);
@@ -521,7 +521,7 @@ public:
 	void ResetOutputs();
 
 	void ResetAudioDevice(const char *sourceId, const char *deviceId,
-			const char *deviceDesc, int channel);
+						  const char *deviceDesc, int channel);
 
 	void NewProject();
 	void LoadProject();
@@ -599,7 +599,7 @@ private slots:
 	void on_actionCenterToScreen_triggered();
 
 	void on_scenes_currentItemChanged(QListWidgetItem *current,
-			QListWidgetItem *prev);
+									  QListWidgetItem *prev);
 	void on_scenes_customContextMenuRequested(const QPoint &pos);
 	void on_actionAddScene_triggered();
 	void on_actionRemoveScene_triggered();
@@ -688,9 +688,9 @@ private slots:
 	void EditSceneItemName();
 
 	void SceneNameEdited(QWidget *editor,
-			QAbstractItemDelegate::EndEditHint endHint);
+						 QAbstractItemDelegate::EndEditHint endHint);
 	void SceneItemNameEdited(QWidget *editor,
-			QAbstractItemDelegate::EndEditHint endHint);
+							 QAbstractItemDelegate::EndEditHint endHint);
 
 	void OpenSceneFilters();
 	void OpenFilters();
@@ -727,7 +727,7 @@ public:
 	virtual config_t *Config() const override;
 
 	virtual int GetProfilePath(char *path, size_t size, const char *file)
-		const override;
+	const override;
 
 private:
 	std::unique_ptr<Ui::OBSBasic> ui;

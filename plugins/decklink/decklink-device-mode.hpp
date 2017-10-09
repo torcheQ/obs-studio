@@ -23,4 +23,8 @@ public:
 	const std::string& GetName(void) const;
 
 	void SetMode(IDeckLinkDisplayMode *mode);
+
+	int GetWidth();
+
+	int GetHeight();
 };

@@ -7,46 +7,55 @@ endif()
 
 find_library(COREFOUNDATION CoreFoundation)
 
-include_directories(${COREFOUNDATION})
-
 set(mac-decklink-sdk_HEADERS
-	decklink-sdk/DeckLinkAPI.h
-	decklink-sdk/DeckLinkAPIConfiguration.h
-	decklink-sdk/DeckLinkAPIDeckControl.h
-	decklink-sdk/DeckLinkAPIDiscovery.h
-	decklink-sdk/DeckLinkAPIModes.h
-	decklink-sdk/DeckLinkAPIStreaming.h
-	decklink-sdk/DeckLinkAPITypes.h
-	decklink-sdk/DeckLinkAPIVersion.h
+		decklink-sdk/DeckLinkAPI.h
+		decklink-sdk/DeckLinkAPIConfiguration.h
+		decklink-sdk/DeckLinkAPIDeckControl.h
+		decklink-sdk/DeckLinkAPIDiscovery.h
+		decklink-sdk/DeckLinkAPIModes.h
+		decklink-sdk/DeckLinkAPIStreaming.h
+		decklink-sdk/DeckLinkAPITypes.h
+		decklink-sdk/DeckLinkAPIVersion.h
 	)
 
 set(mac-decklink-sdk_SOURCES
-	decklink-sdk/DeckLinkAPIDispatch.cpp
+		decklink-sdk/DeckLinkAPIDispatch.cpp
 	)
 
 set(mac-decklink_HEADERS
-	../decklink-devices.hpp
-	../decklink-source.hpp
-	../decklink-output.hpp
-	../platform.hpp
-	../decklink.hpp
-	../decklink-device-instance.hpp
-	../decklink-device-discovery.hpp
-	../decklink-device.hpp
-	../decklink-device-mode.hpp
-	../audio-repack.h
-	../audio-repack.hpp
-	)
+		../decklink-devices.hpp
+		../const.h
+		../DecklinkOutput.hpp
+		../platform.hpp
+		../DecklinkInput.hpp
+		../DecklinkBase.h
+		../decklink-device-instance.hpp
+		../decklink-device-discovery.hpp
+		../decklink-device.hpp
+		../decklink-device-mode.hpp
+		../audio-repack.h
+		../audio-repack.hpp)
 
 set(mac-decklink_SOURCES
-	../plugin-main.cpp
-	../decklink.cpp
-	../decklink-device-instance.cpp
-	../decklink-device-discovery.cpp
-	../decklink-device.cpp
-	../decklink-device-mode.cpp
-	../audio-repack.c
-	platform.cpp)
+		../plugin-main.cpp
+		../decklink-devices.cpp
+		../decklink-output.cpp
+		../decklink-source.cpp
+		../DecklinkOutput.cpp
+		../DecklinkInput.cpp
+		../DecklinkBase.cpp
+		../decklink-device-instance.cpp
+		../decklink-device-discovery.cpp
+		../decklink-device.cpp
+		../decklink-device-mode.cpp
+		../audio-repack.c
+		platform.cpp)
+
+
+include_directories(
+		${COREFOUNDATION})
+
+list(APPEND decklink_HEADERS ${decklink_UI_HEADERS})
 
 add_library(mac-decklink MODULE
 	${mac-decklink_SOURCES}
