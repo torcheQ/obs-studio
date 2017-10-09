@@ -7,7 +7,9 @@ endif()
 
 find_library(COREFOUNDATION CoreFoundation)
 
-include_directories(${COREFOUNDATION})
+include_directories(
+		${COREFOUNDATION}
+		"${CMAKE_SOURCE_DIR}/UI/obs-frontend-api")
 
 set(mac-decklink-sdk_HEADERS
 	decklink-sdk/DeckLinkAPI.h
@@ -26,9 +28,9 @@ set(mac-decklink-sdk_SOURCES
 
 set(mac-decklink_HEADERS
 	../decklink-devices.hpp
-	../decklink-source.hpp
-	../decklink-output.hpp
-	../platform.hpp
+	../const.h
+	../DecklinkOutput.hpp
+        ../platform.hpp
 	../decklink.hpp
 	../decklink-device-instance.hpp
 	../decklink-device-discovery.hpp
@@ -40,7 +42,11 @@ set(mac-decklink_HEADERS
 
 set(mac-decklink_SOURCES
 	../plugin-main.cpp
-	../decklink.cpp
+	../decklink-devices.cpp
+	../decklink-output.cpp
+	../decklink-source.cpp
+        ../DecklinkOutput.cpp
+        ../decklink.cpp
 	../decklink-device-instance.cpp
 	../decklink-device-discovery.cpp
 	../decklink-device.cpp
@@ -56,6 +62,7 @@ add_library(mac-decklink MODULE
 
 target_link_libraries(mac-decklink
 	libobs
-	${COREFOUNDATION})
+	${COREFOUNDATION}
+	obs-frontend-api)
 
 install_obs_plugin_with_data(mac-decklink ../data)

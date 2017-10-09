@@ -1,37 +1,11 @@
 #include <obs-module.h>
+
+#include "const.h"
+
 #include "decklink.hpp"
 #include "decklink-device.hpp"
 #include "decklink-device-discovery.hpp"
 #include "decklink-devices.hpp"
-
-#define DEVICE_HASH     "device_hash"
-#define DEVICE_NAME     "device_name"
-#define MODE_ID         "mode_id"
-#define MODE_NAME       "mode_name"
-#define CHANNEL_FORMAT  "channel_format"
-#define PIXEL_FORMAT    "pixel_format"
-#define COLOR_SPACE     "color_space"
-#define COLOR_RANGE     "color_range"
-#define BUFFERING       "buffering"
-
-#define TEXT_DEVICE                     obs_module_text("Device")
-#define TEXT_MODE                       obs_module_text("Mode")
-#define TEXT_PIXEL_FORMAT               obs_module_text("PixelFormat")
-#define TEXT_COLOR_SPACE                obs_module_text("ColorSpace")
-#define TEXT_COLOR_SPACE_DEFAULT        obs_module_text("ColorSpace.Default")
-#define TEXT_COLOR_RANGE                obs_module_text("ColorRange")
-#define TEXT_COLOR_RANGE_DEFAULT        obs_module_text("ColorRange.Default")
-#define TEXT_COLOR_RANGE_PARTIAL        obs_module_text("ColorRange.Partial")
-#define TEXT_COLOR_RANGE_FULL           obs_module_text("ColorRange.Full")
-#define TEXT_CHANNEL_FORMAT             obs_module_text("ChannelFormat")
-#define TEXT_CHANNEL_FORMAT_NONE        obs_module_text("ChannelFormat.None")
-#define TEXT_CHANNEL_FORMAT_2_0CH       obs_module_text("ChannelFormat.2_0ch")
-#define TEXT_CHANNEL_FORMAT_2_1CH       obs_module_text("ChannelFormat.2_1ch")
-#define TEXT_CHANNEL_FORMAT_4_0CH       obs_module_text("ChannelFormat.4_0ch")
-#define TEXT_CHANNEL_FORMAT_4_1CH       obs_module_text("ChannelFormat.4_1ch")
-#define TEXT_CHANNEL_FORMAT_5_1CH       obs_module_text("ChannelFormat.5_1ch")
-#define TEXT_CHANNEL_FORMAT_7_1CH       obs_module_text("ChannelFormat.7_1ch")
-#define TEXT_BUFFERING                  obs_module_text("Buffering")
 
 static void decklink_enable_buffering(DeckLink *decklink, bool enabled)
 {
@@ -149,7 +123,7 @@ static bool decklink_device_changed(obs_properties_t *props,
 		obs_property_list_item_disable(modeList, 0, true);
 	} else {
 		const std::vector<DeckLinkDeviceMode*> &modes =
-				device->GetModes();
+				device->GetInputModes();
 
 		for (DeckLinkDeviceMode *mode : modes) {
 			obs_property_list_add_int(modeList,
@@ -172,20 +146,6 @@ static bool decklink_device_changed(obs_properties_t *props,
 	}
 
 	return true;
-}
-
-static void fill_out_devices(obs_property_t *list)
-{
-	deviceEnum->Lock();
-
-	const std::vector<DeckLinkDevice*> &devices = deviceEnum->GetDevices();
-	for (DeckLinkDevice *device : devices) {
-		obs_property_list_add_string(list,
-									 device->GetDisplayName().c_str(),
-									 device->GetHash().c_str());
-	}
-
-	deviceEnum->Unlock();
 }
 
 static bool color_format_changed(obs_properties_t *props,
@@ -278,14 +238,18 @@ static obs_properties_t *decklink_get_properties(void *data)
 	return props;
 }
 
-struct obs_source_info decklink_source_info = {
-		.id             = "decklink-input",
-		.type           = OBS_SOURCE_TYPE_INPUT,
-		.output_flags   = OBS_SOURCE_ASYNC_VIDEO | OBS_SOURCE_AUDIO | OBS_SOURCE_DO_NOT_DUPLICATE,
-		.create         = decklink_create,
-		.destroy        = decklink_destroy,
-		.get_defaults   = decklink_get_defaults,
-		.get_name       = decklink_get_name,
-		.get_properties = decklink_get_properties,
-		.update         = decklink_update
-};
+
+struct obs_source_info create_decklink_source_info() {
+	struct obs_source_info decklink_source_info  {};
+	decklink_source_info.id             = "decklink-input";
+	decklink_source_info.type           = OBS_SOURCE_TYPE_INPUT;
+	decklink_source_info.output_flags   = OBS_SOURCE_ASYNC_VIDEO | OBS_SOURCE_AUDIO | OBS_SOURCE_DO_NOT_DUPLICATE;
+	decklink_source_info.create         = decklink_create;
+	decklink_source_info.destroy        = decklink_destroy;
+	decklink_source_info.get_defaults   = decklink_get_defaults;
+	decklink_source_info.get_name       = decklink_get_name;
+	decklink_source_info.get_properties = decklink_get_properties;
+	decklink_source_info.update         = decklink_update;
+
+	return decklink_source_info;
+}

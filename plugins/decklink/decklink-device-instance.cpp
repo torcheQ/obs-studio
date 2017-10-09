@@ -6,8 +6,8 @@
 
 #include <sstream>
 
-#define LOG(level, message, ...) blog(level, "%s: " message, \
-		obs_source_get_name(this->decklink->GetSource()), ##__VA_ARGS__)
+#define LOG(level, message, ...) blog(level, "%s: " message, "decklink", ##__VA_ARGS__)
+		//obs_source_get_name(this->decklink->GetSource()), ##__VA_ARGS__)
 
 #ifdef _WIN32
 #define IS_WIN 1
@@ -69,6 +69,12 @@ DeckLinkDeviceInstance::DeckLinkDeviceInstance(DeckLink *decklink_,
 	currentPacket.samples_per_sec = 48000;
 	currentPacket.speakers        = SPEAKERS_STEREO;
 	currentPacket.format          = AUDIO_FORMAT_16BIT;
+
+	conversion_video_data = new video_data();
+	for (size_t i = 0; i < MAX_AV_PLANES; i++) {
+		conversion_video_data->data[i] = new uint8_t[1920 * 1080 * 2];
+		conversion_video_data->linesize[i] = 1920 * 2;
+	}
 }
 
 DeckLinkDeviceInstance::~DeckLinkDeviceInstance()
@@ -286,6 +292,76 @@ bool DeckLinkDeviceInstance::StopCapture(void)
 	FinalizeStream();
 
 	return true;
+}
+
+bool DeckLinkDeviceInstance::StartOutput(DeckLinkDeviceMode *mode_)
+{
+	if (mode != nullptr)
+		return false;
+	if (mode_ == nullptr)
+		return false;
+
+	LOG(LOG_INFO, "Starting output...");
+
+	if (!device->GetOutput(&output))
+		return false;
+
+	const HRESULT videoResult = output->EnableVideoOutput(mode_->GetDisplayMode(), bmdVideoOutputFlagDefault);
+	if (videoResult != S_OK) {
+		LOG(LOG_ERROR, "Failed to enable video output");
+		return false;
+	}
+
+	mode = mode_;
+
+	return true;
+}
+
+bool DeckLinkDeviceInstance::StopOutput(void)
+{
+	if (mode == nullptr || output == nullptr)
+		return false;
+
+	LOG(LOG_INFO, "Stopping output of '%s'...",
+		GetDevice()->GetDisplayName().c_str());
+
+
+	output->DisableVideoOutput();
+
+	return true;
+}
+
+void DeckLinkDeviceInstance::DisplayVideoFrame(video_scaler *scaler, video_data *frame)
+{
+	HRESULT                         result;
+	IDeckLinkMutableVideoFrame*     decklinkFrame = NULL;
+
+	result = output->CreateVideoFrame(1920, 1080, 1920*2, bmdFormat8BitYUV, bmdFrameFlagDefault, &decklinkFrame);
+	if (result != S_OK) {
+		blog(LOG_ERROR ,"failed to make frame 0x%X", result);
+		return;
+	}
+
+	bool success = video_scaler_scale(scaler, conversion_video_data->data, conversion_video_data->linesize,
+								 (const uint8_t * const*)frame->data,
+								 frame->linesize);
+
+	uint8_t * nextWord;
+	decklinkFrame->GetBytes((void**)&nextWord);
+
+	uint8_t *outData = conversion_video_data->data[0];
+
+	uint32_t wordsRemaining = (1920 * 1080) * 2;
+
+	while (wordsRemaining > 0)
+	{
+		*(nextWord++) = *(outData++);
+		wordsRemaining = wordsRemaining - 1;
+	}
+
+	output->DisplayVideoFrameSync(decklinkFrame);
+
+	decklinkFrame->Release();
 }
 
 #define TIME_BASE 1000000000
