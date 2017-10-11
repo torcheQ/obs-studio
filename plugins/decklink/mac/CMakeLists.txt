@@ -26,8 +26,7 @@ set(mac-decklink-sdk_SOURCES
 
 set(mac-decklink_HEADERS
 	../decklink-devices.hpp
-	../decklink-source.hpp
-	../decklink-output.hpp
+	../const.h
 	../DecklinkOutput.hpp
 	../platform.hpp
 	../decklink.hpp
@@ -41,6 +40,10 @@ set(mac-decklink_HEADERS
 
 set(mac-decklink_SOURCES
 	../plugin-main.cpp
+	../decklink-devices.cpp
+	../decklink-output.cpp
+	../decklink-source.cpp
+	../decklink-filter.cpp
 	../DecklinkOutput.cpp
 	../decklink.cpp
 	../decklink-device-instance.cpp

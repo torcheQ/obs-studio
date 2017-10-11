@@ -22,8 +22,7 @@ set(linux-decklink-sdk_SOURCES
 
 set(linux-decklink_HEADERS
 	../decklink-devices.hpp
-	../decklink-source.hpp
-	../decklink-output.hpp
+	../const.h
 	../DecklinkOutput.hpp
 	../platform.hpp
 	../decklink.hpp
@@ -37,6 +36,9 @@ set(linux-decklink_HEADERS
 
 set(linux-decklink_SOURCES
 	../plugin-main.cpp
+		../decklink-devices.cpp
+		../decklink-source.cpp
+	../decklink-output.cpp
 	../DecklinkOutput.cpp
 	../decklink.cpp
 	../decklink-device-instance.cpp

@@ -1,6 +1,8 @@
 #include <obs-module.h>
 #include <obs-avc.h>
 
+#include "const.h"
+
 #include "DecklinkOutput.hpp"
 #include "decklink-device.hpp"
 #include "decklink-device-discovery.hpp"
@@ -84,7 +86,7 @@ static obs_properties_t *decklink_output_properties(void *unused)
 
 	obs_property_t *list = obs_properties_add_list(props, DEVICE_HASH,
 												   TEXT_DEVICE, OBS_COMBO_TYPE_LIST, OBS_COMBO_FORMAT_STRING);
-	obs_property_set_modified_callback(list, decklink_device_changed);
+//	obs_property_set_modified_callback(list, decklink_device_changed);
 
 	fill_out_devices(list);
 
@@ -97,15 +99,19 @@ static const char *decklink_output_get_name(void*)
 	return obs_module_text("BlackmagicDevice");
 }
 
-struct obs_output_info decklink_output_info = {
-		.id             = "decklink_output",
-        .flags          = OBS_OUTPUT_AV,
-		.get_name       = decklink_output_get_name,
-		.create         = decklink_output_create,
-		.destroy        = decklink_output_destroy,
-		.start          = decklink_output_start,
-		.stop           = decklink_output_stop,
-		.get_properties = decklink_output_properties,
-		.raw_video      = decklink_output_raw_video,
-		.raw_audio      = decklink_output_raw_audio
-};
+struct obs_output_info create_decklink_output_info() {
+	struct obs_output_info decklink_output_info = {};
+
+	decklink_output_info.id             = "decklink_output";
+	decklink_output_info.flags          = OBS_OUTPUT_AV;
+	decklink_output_info.get_name       = decklink_output_get_name;
+	decklink_output_info.create         = decklink_output_create;
+	decklink_output_info.destroy        = decklink_output_destroy;
+	decklink_output_info.start          = decklink_output_start;
+	decklink_output_info.stop           = decklink_output_stop;
+	decklink_output_info.get_properties = decklink_output_properties;
+	decklink_output_info.raw_video      = decklink_output_raw_video;
+	decklink_output_info.raw_audio      = decklink_output_raw_audio;
+
+	return decklink_output_info;
+}
