@@ -18,6 +18,7 @@ set(win-decklink-sdk_HEADERS
 set(win-decklink_HEADERS
 	../decklink-devices.hpp
 	../DecklinkOutput.hpp
+	../DecklinkFilter.hpp
 	../const.h
 	../platform.hpp
 	../decklink.hpp
@@ -33,6 +34,8 @@ set(win-decklink_SOURCES
 	../plugin-main.cpp
 	../decklink-devices.cpp
 	../DecklinkOutput.cpp
+	../DecklinkFilter.cpp
+	../decklink-filter.cpp
 	../decklink-source.cpp
 	../decklink-output.cpp
 	../decklink.cpp
@@ -47,7 +50,8 @@ add_idl_files(win-decklink-sdk_GENERATED_FILES
 	${win-decklink-sdk_IDLS})
 
 include_directories(
-	${CMAKE_CURRENT_BINARY_DIR})
+	${CMAKE_CURRENT_BINARY_DIR}
+	"${CMAKE_SOURCE_DIR}/UI/obs-frontend-api")
 
 add_library(win-decklink MODULE
 	${win-decklink_SOURCES}
@@ -56,6 +60,7 @@ add_library(win-decklink MODULE
 	${win-decklink-sdk_GENERATED_FILES})
 
 target_link_libraries(win-decklink
-	libobs)
+	libobs
+	obs-frontend-api)
 
 install_obs_plugin_with_data(win-decklink ../data)

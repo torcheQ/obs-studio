@@ -34,17 +34,15 @@ static bool decklink_output_start(void *data)
 
 	obs_get_video_info(&ovi);
 
-	struct video_scale_info from = {
-		.format = ovi.output_format,
-		.width  = ovi.output_width,
-		.height = ovi.output_height,
-	};
+	struct video_scale_info from = {};
+	from.format = ovi.output_format;
+	from.width = ovi.output_width;
+	from.height = ovi.output_height;
 
-	struct video_scale_info to = {
-		.format = VIDEO_FORMAT_UYVY,
-		.width  = 1920,
-		.height = 1080,
-	};
+	struct video_scale_info to = {};
+	to.format = VIDEO_FORMAT_UYVY;
+	to.width = 1920;
+	to.height = 1080;
 
 	video_scaler_create(&decklink->scaler, &to, &from, VIDEO_SCALE_FAST_BILINEAR);
 

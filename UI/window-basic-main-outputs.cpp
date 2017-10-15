@@ -357,10 +357,9 @@ SimpleOutput::SimpleOutput(OBSBasic *main_) : BasicOutputHandler(main_)
 					OBSReplayBufferStopping, this);
 		}
 
-		// fileOutput = obs_output_create("ffmpeg_muxer",
-		//		"simple_file_output", nullptr, nullptr);
+		fileOutput = obs_output_create("ffmpeg_muxer",
+				"simple_file_output", nullptr, nullptr);
 
-		fileOutput = obs_output_create("decklink_output", "", nullptr, nullptr);
 		if (!fileOutput)
 			throw "Failed to create recording output "
 			      "(simple output)";

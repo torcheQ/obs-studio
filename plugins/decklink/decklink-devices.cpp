@@ -1,4 +1,4 @@
-#import "decklink-devices.hpp"
+#include "decklink-devices.hpp"
 
 DeckLinkDeviceDiscovery *deviceEnum = nullptr;
 

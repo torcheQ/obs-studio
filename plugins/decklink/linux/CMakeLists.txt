@@ -5,6 +5,9 @@ if(DISABLE_DECKLINK)
 	return()
 endif()
 
+include_directories(
+		"${CMAKE_SOURCE_DIR}/UI/obs-frontend-api")
+
 set(linux-decklink-sdk_HEADERS
 	decklink-sdk/DeckLinkAPI.h
 	decklink-sdk/DeckLinkAPIConfiguration.h
@@ -24,6 +27,7 @@ set(linux-decklink_HEADERS
 	../decklink-devices.hpp
 	../const.h
 	../DecklinkOutput.hpp
+	../DecklinkFilter.hpp
 	../platform.hpp
 	../decklink.hpp
 	../decklink-device-instance.hpp
@@ -36,10 +40,11 @@ set(linux-decklink_HEADERS
 
 set(linux-decklink_SOURCES
 	../plugin-main.cpp
-		../decklink-devices.cpp
-		../decklink-source.cpp
+	../decklink-devices.cpp
+	../decklink-source.cpp
 	../decklink-output.cpp
 	../DecklinkOutput.cpp
+	../DecklinkFilter.cpp
 	../decklink.cpp
 	../decklink-device-instance.cpp
 	../decklink-device-discovery.cpp
@@ -55,6 +60,7 @@ add_library(linux-decklink MODULE
 	${linux-decklink-sdk_SOURCES})
 
 target_link_libraries(linux-decklink
-	libobs)
+	libobs
+	obs-frontend-api)
 
 install_obs_plugin_with_data(linux-decklink ../data)
