@@ -32,10 +32,12 @@ void decklink_filter_update(void* data, obs_data_t* settings) {
 	decklink->Deactivate();
 
 	const char *hash = obs_data_get_string(settings, DEVICE_HASH);
+	long long id = obs_data_get_int(settings, MODE_ID);
+
 	ComPtr<DeckLinkDevice> device;
 	device.Set(deviceEnum->FindByHash(hash));
 
-	decklink->Activate(device, -1);
+	decklink->Activate(device, id);
 }
 
 static void decklink_filter_raw_video(void *data, struct video_data *frame){
@@ -160,6 +162,54 @@ struct obs_audio_data* decklink_filter_audiofilter(void *data,
 	return audio_data;
 }
 
+static bool decklink_filter_device_changed(obs_properties_t *props,
+									obs_property_t *list, obs_data_t *settings)
+{
+	const char *name = obs_data_get_string(settings, DEVICE_NAME);
+	const char *hash = obs_data_get_string(settings, DEVICE_HASH);
+	const char *mode = obs_data_get_string(settings, MODE_NAME);
+	long long modeId = obs_data_get_int(settings, MODE_ID);
+
+	size_t itemCount = obs_property_list_item_count(list);
+	bool itemFound = false;
+
+	for (size_t i = 0; i < itemCount; i++) {
+		const char *curHash = obs_property_list_item_string(list, i);
+		if (strcmp(hash, curHash) == 0) {
+			itemFound = true;
+			break;
+		}
+	}
+
+	if (!itemFound) {
+		obs_property_list_insert_string(list, 0, name, hash);
+		obs_property_list_item_disable(list, 0, true);
+	}
+
+	obs_property_t *modeList = obs_properties_get(props, MODE_ID);
+
+	obs_property_list_clear(modeList);
+
+	ComPtr<DeckLinkDevice> device;
+	device.Set(deviceEnum->FindByHash(hash));
+
+	if (!device) {
+		obs_property_list_add_int(modeList, mode, modeId);
+		obs_property_list_item_disable(modeList, 0, true);
+	} else {
+		const std::vector<DeckLinkDeviceMode*> &modes =
+				device->GetOutputModes();
+
+		for (DeckLinkDeviceMode *mode : modes) {
+			obs_property_list_add_int(modeList,
+									  mode->GetName().c_str(),
+									  mode->GetId());
+		}
+	}
+
+	return true;
+}
+
 static obs_properties_t *decklink_filter_properties(void *unused)
 {
 	UNUSED_PARAMETER(unused);
@@ -168,10 +218,12 @@ static obs_properties_t *decklink_filter_properties(void *unused)
 
 	obs_property_t *list = obs_properties_add_list(props, DEVICE_HASH,
 												   TEXT_DEVICE, OBS_COMBO_TYPE_LIST, OBS_COMBO_FORMAT_STRING);
-	//obs_property_set_modified_callback(list, decklink_device_changed);
+	obs_property_set_modified_callback(list, decklink_filter_device_changed);
 
 	fill_out_devices(list);
 
+	list = obs_properties_add_list(props, MODE_ID, TEXT_MODE,
+								   OBS_COMBO_TYPE_LIST, OBS_COMBO_FORMAT_INT);
 
 	return props;
 }

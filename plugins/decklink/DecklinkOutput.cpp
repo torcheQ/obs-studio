@@ -91,13 +91,12 @@ bool DeckLinkOutput::Activate(DeckLinkDevice *device, long long modeId)
 		}
 	}
 
-	if (!instance->StartOutput()) {
+	if (!instance->StartOutput(nullptr)) { //TODO: pass mode here
 		instance = nullptr;
 		return false;
 	}
 
 	os_atomic_inc_long(&activateRefs);
-	//SaveSettings();
 	return true;
 }
 

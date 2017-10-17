@@ -53,15 +53,13 @@ bool DecklinkFilter::Activate(DeckLinkDevice *device, long long modeId)
 	if (instance == nullptr)
 		return false;
 
-	if (modeId >= 0) {
-		DeckLinkDeviceMode *mode = GetDevice()->FindOutputMode(modeId);
-		if (mode == nullptr) {
-			instance = nullptr;
-			return false;
-		}
+	DeckLinkDeviceMode *mode = GetDevice()->FindOutputMode(modeId);
+	if (mode == nullptr) {
+		instance = nullptr;
+		return false;
 	}
 
-	if (!instance->StartOutput()) {
+	if (!instance->StartOutput(mode)) {
 		instance = nullptr;
 		return false;
 	}

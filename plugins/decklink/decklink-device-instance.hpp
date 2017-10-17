@@ -56,7 +56,7 @@ public:
 	bool StartCapture(DeckLinkDeviceMode *mode);
 	bool StopCapture(void);
 
-	bool StartOutput();
+	bool StartOutput(DeckLinkDeviceMode *mode_);
 	bool StopOutput(void);
 
 	HRESULT STDMETHODCALLTYPE VideoInputFrameArrived(

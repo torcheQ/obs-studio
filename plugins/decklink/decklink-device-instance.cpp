@@ -262,18 +262,25 @@ bool DeckLinkDeviceInstance::StopCapture(void)
 	return true;
 }
 
-bool DeckLinkDeviceInstance::StartOutput()
+bool DeckLinkDeviceInstance::StartOutput(DeckLinkDeviceMode *mode_)
 {
+	if (mode != nullptr)
+		return false;
+	if (mode_ == nullptr)
+		return false;
+
 	LOG(LOG_INFO, "Starting output...");
 
 	if (!device->GetOutput(&output))
 		return false;
 
-	const HRESULT videoResult = output->EnableVideoOutput(bmdModeHD1080i6000, bmdVideoOutputFlagDefault);
+	const HRESULT videoResult = output->EnableVideoOutput(mode_->GetDisplayMode(), bmdVideoOutputFlagDefault);
 	if (videoResult != S_OK) {
 		LOG(LOG_ERROR, "Failed to enable video output");
 		return false;
 	}
+
+	mode = mode_;
 
 	return true;
 }
@@ -286,8 +293,8 @@ bool DeckLinkDeviceInstance::StopOutput(void)
 	LOG(LOG_INFO, "Stopping output of '%s'...",
 		GetDevice()->GetDisplayName().c_str());
 
-	input->StopStreams();
-	FinalizeStream();
+
+	output->DisableVideoOutput();
 
 	return true;
 }
