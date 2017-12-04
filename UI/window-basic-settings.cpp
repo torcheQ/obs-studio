@@ -1858,7 +1858,11 @@ void OBSBasicSettings::LoadOutputSettings()
 
 	const char *mode = config_get_string(main->Config(), "Output", "Mode");
 
-	int modeIdx = astrcmpi(mode, "Advanced") == 0 ? 1 : 0;
+	int modeIdx = 0;
+	if (astrcmpi(mode, "Advanced") == 0)
+		modeIdx = 1;
+	if (astrcmpi(mode, "Plugin") == 0)
+		modeIdx = 2;
 	ui->outputMode->setCurrentIndex(modeIdx);
 
 	LoadSimpleOutputSettings();
@@ -2831,6 +2835,8 @@ void OBSBasicSettings::SaveAdvancedSettings()
 
 static inline const char *OutputModeFromIdx(int idx)
 {
+	if (idx == 2)
+		return "Plugin";
 	if (idx == 1)
 		return "Advanced";
 	else
