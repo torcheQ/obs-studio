@@ -1527,6 +1527,20 @@ void OBSBasicSettings::LoadSimpleOutputSettings()
 	SimpleStreamingEncoderChanged();
 }
 
+void OBSBasicSettings::LoadPluginOutputSettings()
+{
+	const char    *type;
+	size_t        idx = 0;
+
+	while (obs_enum_output_types(idx++, &type)) {
+		const char *name = obs_output_get_display_name(type);
+		QString qName = QT_UTF8(name);
+		QString qType = QT_UTF8(type);
+
+		ui->pluginOutputType->addItem(qName, qType);
+	}
+}
+
 void OBSBasicSettings::LoadAdvOutputStreamingSettings()
 {
 	bool rescale = config_get_bool(main->Config(), "AdvOut",
@@ -1872,6 +1886,7 @@ void OBSBasicSettings::LoadOutputSettings()
 	LoadAdvOutputRecordingEncoderProperties();
 	LoadAdvOutputFFmpegSettings();
 	LoadAdvOutputAudioSettings();
+	LoadPluginOutputSettings();
 
 	if (video_output_active(obs_get_video())) {
 		ui->outputMode->setEnabled(false);
@@ -3290,6 +3305,24 @@ void OBSBasicSettings::on_buttonBox_clicked(QAbstractButton *button)
 		ClearChanged();
 		close();
 	}
+}
+
+void OBSBasicSettings::on_pluginOutputType_currentIndexChanged(int idx)
+{
+	QLayout *layout = ui->pluginOutputSettings->layout();
+	QString pluginType = ui->pluginOutputType->itemData(idx).toString();
+	obs_data_t *settings = obs_output_defaults(QT_TO_UTF8(pluginType));
+
+	delete pluginOutputProps;
+
+	pluginOutputProps = new OBSPropertiesView(settings,
+			QT_TO_UTF8(pluginType),
+			(PropertiesReloadCallback)obs_get_output_properties,
+			170);
+
+	layout->addWidget(pluginOutputProps);
+
+	obs_data_release(settings);
 }
 
 void OBSBasicSettings::on_streamType_currentIndexChanged(int idx)

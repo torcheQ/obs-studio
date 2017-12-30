@@ -1330,7 +1330,7 @@
                  <item>
                   <widget class="QTabWidget" name="advOutTabs">
                    <property name="currentIndex">
-                    <number>0</number>
+                    <number>3</number>
                    </property>
                    <property name="usesScrollButtons">
                     <bool>true</bool>
@@ -3169,7 +3169,29 @@
                  </item>
                 </layout>
                </widget>
-               <widget class="QWidget" name="page_6"/>
+               <widget class="QWidget" name="pluginOutputsPage">
+                <widget class="QComboBox" name="pluginOutputType">
+                 <property name="geometry">
+                  <rect>
+                   <x>10</x>
+                   <y>10</y>
+                   <width>421</width>
+                   <height>26</height>
+                  </rect>
+                 </property>
+                </widget>
+                <widget class="QWidget" name="verticalLayoutWidget">
+                 <property name="geometry">
+                  <rect>
+                   <x>10</x>
+                   <y>40</y>
+                   <width>751</width>
+                   <height>261</height>
+                  </rect>
+                 </property>
+                 <layout class="QVBoxLayout" name="pluginOutputSettings"/>
+                </widget>
+               </widget>
               </widget>
              </item>
             </layout>
@@ -3378,8 +3400,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>784</width>
-              <height>77</height>
+              <width>74</width>
+              <height>16</height>
              </rect>
             </property>
            </widget>

@@ -105,6 +105,7 @@ private:
 	OBSPropertiesView *streamProperties = nullptr;
 	OBSPropertiesView *streamEncoderProps = nullptr;
 	OBSPropertiesView *recordEncoderProps = nullptr;
+	OBSPropertiesView *pluginOutputProps = nullptr;
 
 	QPointer<QLabel> advOutRecWarning;
 	QPointer<QLabel> simpleOutRecWarning;
@@ -195,6 +196,7 @@ private:
 	void LoadHotkeySettings(obs_hotkey_id ignoreKey=OBS_INVALID_HOTKEY_ID);
 	void LoadAdvancedSettings();
 	void LoadSettings(bool changedOnly);
+	void LoadPluginOutputSettings();
 
 	OBSPropertiesView *CreateEncoderPropertyView(const char *encoder,
 			const char *path, bool changed = false);
@@ -262,6 +264,7 @@ private slots:
 	void on_advOutFFAEncoder_currentIndexChanged(int idx);
 	void on_advOutFFVEncoder_currentIndexChanged(int idx);
 	void on_advOutFFType_currentIndexChanged(int idx);
+	void on_pluginOutputType_currentIndexChanged(int idx);
 
 	void on_colorFormat_currentIndexChanged(const QString &text);
 

@@ -22,7 +22,6 @@ static void *decklink_output_create(obs_data_t *settings, obs_output_t *output)
 
 	obs_output_update(output, settings);
 
-
 	return decklinkOutput;
 }
 
