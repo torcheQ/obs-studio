@@ -12,22 +12,36 @@
 
 static void decklink_output_destroy(void *data)
 {
-	DeckLinkOutput *decklink = (DeckLinkOutput *)data;
+	auto *decklink = (DeckLinkOutput *)data;
 	delete decklink;
 }
 
 static void *decklink_output_create(obs_data_t *settings, obs_output_t *output)
 {
-	DeckLinkOutput *decklinkOutput = new DeckLinkOutput(output, deviceEnum);
+	auto *decklinkOutput = new DeckLinkOutput(output, deviceEnum);
 
 	obs_output_update(output, settings);
 
 	return decklinkOutput;
 }
 
+static void decklink_output_update(void *data, obs_data_t *settings)
+{
+    auto *decklink = (DeckLinkOutput *)data;
+
+    const char *hash = obs_data_get_string(settings, DEVICE_HASH);
+    long long modeID = obs_data_get_int(settings, MODE_ID);
+
+    ComPtr<DeckLinkDevice> device;
+
+    device.Set(deviceEnum->FindByHash(hash));
+
+    decklink->Activate(device, modeID);
+}
+
 static bool decklink_output_start(void *data)
 {
-	DeckLinkOutput *decklink = (DeckLinkOutput *)data;
+	auto *decklink = (DeckLinkOutput *)data;
 
 	struct obs_video_info ovi;
 
@@ -45,12 +59,6 @@ static bool decklink_output_start(void *data)
 
 	video_scaler_create(&decklink->scaler, &to, &from, VIDEO_SCALE_FAST_BILINEAR);
 
-	ComPtr<DeckLinkDevice> device;
-
-	device.Set(deviceEnum->FindByHash("4123904_UltraStudio Mini Monitor"));
-
-	decklink->Activate(device, -1);
-
 	if (!obs_output_begin_data_capture(decklink->GetOutput(), 0)) {
 		return false;
 	}
@@ -61,11 +69,11 @@ static bool decklink_output_start(void *data)
 
 static void decklink_output_stop(void *data, uint64_t ts)
 {
-	DeckLinkOutput *decklink = (DeckLinkOutput *)data;
+	auto *decklink = (DeckLinkOutput *)data;
 }
 
 static void decklink_output_raw_video(void *data, struct video_data *frame){
-	DeckLinkOutput *decklink = (DeckLinkOutput *)data;
+	auto *decklink = (DeckLinkOutput *)data;
 
 	decklink->DisplayVideoFrame(frame);
 }
@@ -73,6 +81,54 @@ static void decklink_output_raw_video(void *data, struct video_data *frame){
 static void decklink_output_raw_audio(void *data, struct audio_data *frames)
 {
 
+}
+
+static bool decklink_output_device_changed(obs_properties_t *props,
+                                            obs_property_t *list, obs_data_t *settings)
+{
+    const char *name = obs_data_get_string(settings, DEVICE_NAME);
+    const char *hash = obs_data_get_string(settings, DEVICE_HASH);
+    const char *mode = obs_data_get_string(settings, MODE_NAME);
+    long long modeId = obs_data_get_int(settings, MODE_ID);
+
+    size_t itemCount = obs_property_list_item_count(list);
+    bool itemFound = false;
+
+    for (size_t i = 0; i < itemCount; i++) {
+        const char *curHash = obs_property_list_item_string(list, i);
+        if (strcmp(hash, curHash) == 0) {
+            itemFound = true;
+            break;
+        }
+    }
+
+    if (!itemFound) {
+        obs_property_list_insert_string(list, 0, name, hash);
+        obs_property_list_item_disable(list, 0, true);
+    }
+
+    obs_property_t *modeList = obs_properties_get(props, MODE_ID);
+
+    obs_property_list_clear(modeList);
+
+    ComPtr<DeckLinkDevice> device;
+    device.Set(deviceEnum->FindByHash(hash));
+
+    if (!device) {
+        obs_property_list_add_int(modeList, mode, modeId);
+        obs_property_list_item_disable(modeList, 0, true);
+    } else {
+        const std::vector<DeckLinkDeviceMode*> &modes =
+                device->GetOutputModes();
+
+        for (DeckLinkDeviceMode *mode : modes) {
+            obs_property_list_add_int(modeList,
+                                      mode->GetName().c_str(),
+                                      mode->GetId());
+        }
+    }
+
+    return true;
 }
 
 static obs_properties_t *decklink_output_properties(void *unused)
@@ -83,11 +139,12 @@ static obs_properties_t *decklink_output_properties(void *unused)
 
 	obs_property_t *list = obs_properties_add_list(props, DEVICE_HASH,
 												   TEXT_DEVICE, OBS_COMBO_TYPE_LIST, OBS_COMBO_FORMAT_STRING);
-//	obs_property_set_modified_callback(list, decklink_device_changed);
+	obs_property_set_modified_callback(list, decklink_output_device_changed);
 
 	fill_out_devices(list);
 
-
+    obs_properties_add_list(props, MODE_ID, TEXT_MODE, OBS_COMBO_TYPE_LIST, OBS_COMBO_FORMAT_INT);
+    
 	return props;
 }
 
@@ -109,6 +166,7 @@ struct obs_output_info create_decklink_output_info() {
 	decklink_output_info.get_properties = decklink_output_properties;
 	decklink_output_info.raw_video      = decklink_output_raw_video;
 	decklink_output_info.raw_audio      = decklink_output_raw_audio;
+    decklink_output_info.update         = decklink_output_update;
 
 	return decklink_output_info;
 }

@@ -825,7 +825,7 @@
              <item>
               <widget class="QStackedWidget" name="outputModePages">
                <property name="currentIndex">
-                <number>2</number>
+                <number>1</number>
                </property>
                <widget class="QWidget" name="easyOutputsPage">
                 <layout class="QVBoxLayout" name="verticalLayout_3">
