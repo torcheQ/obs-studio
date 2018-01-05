@@ -1778,6 +1778,140 @@ bool AdvancedOutput::ReplayBufferActive() const
 
 /* ------------------------------------------------------------------------ */
 
+struct PluginOutput : BasicOutputHandler {
+	OBSEncoder             aacTrack[MAX_AUDIO_MIXES];
+	OBSEncoder             h264Streaming;
+	OBSEncoder             h264Recording;
+
+	PluginOutput(OBSBasic *main_);
+
+	inline void UpdateStreamSettings();
+	inline void UpdateRecordingSettings();
+	inline void UpdateAudioSettings();
+	virtual void Update() override;
+
+	inline void SetupStreaming();
+	inline void SetupRecording();
+	void SetupOutputs();
+
+	virtual bool StartStreaming(obs_service_t *service) override;
+	virtual bool StartRecording() override;
+	virtual bool StartReplayBuffer() override;
+	virtual void StopStreaming(bool force) override;
+	virtual void StopRecording(bool force) override;
+	virtual void StopReplayBuffer(bool force) override;
+	virtual bool StreamingActive() const override;
+	virtual bool RecordingActive() const override;
+	virtual bool ReplayBufferActive() const override;
+};
+
+PluginOutput::PluginOutput(OBSBasic *main_) : BasicOutputHandler(main_)
+{
+	startRecording.Connect(obs_output_get_signal_handler(fileOutput),
+						   "start", OBSStartRecording, this);
+	stopRecording.Connect(obs_output_get_signal_handler(fileOutput),
+						  "stop", OBSStopRecording, this);
+	recordStopping.Connect(obs_output_get_signal_handler(fileOutput),
+						   "stopping", OBSRecordStopping, this);
+}
+
+void PluginOutput::UpdateStreamSettings()
+{
+
+}
+
+inline void PluginOutput::UpdateRecordingSettings()
+{
+
+}
+
+void PluginOutput::Update()
+{
+	UpdateRecordingSettings();
+	UpdateAudioSettings();
+}
+
+inline void PluginOutput::SetupStreaming()
+{
+
+}
+
+inline void PluginOutput::SetupRecording()
+{
+
+}
+
+inline void PluginOutput::UpdateAudioSettings()
+{
+
+}
+
+void PluginOutput::SetupOutputs()
+{
+	SetupRecording();
+}
+
+bool PluginOutput::StartStreaming(obs_service_t *service)
+{
+	return false;
+}
+
+bool PluginOutput::StartRecording()
+{
+	const char * pluginType = config_get_string(main->Config(), "PluginOut",
+												"PluginType");
+
+	fileOutput = obs_output_create(pluginType, "", nullptr, nullptr);
+
+	return false;
+}
+
+bool PluginOutput::StartReplayBuffer()
+{
+	return false;
+}
+
+void PluginOutput::StopStreaming(bool force)
+{
+	if (force)
+		obs_output_force_stop(streamOutput);
+	else
+		obs_output_stop(streamOutput);
+}
+
+void PluginOutput::StopRecording(bool force)
+{
+	if (force)
+		obs_output_force_stop(fileOutput);
+	else
+		obs_output_stop(fileOutput);
+}
+
+void PluginOutput::StopReplayBuffer(bool force)
+{
+	if (force)
+		obs_output_force_stop(replayBuffer);
+	else
+		obs_output_stop(replayBuffer);
+}
+
+bool PluginOutput::StreamingActive() const
+{
+	return obs_output_active(streamOutput);
+}
+
+bool PluginOutput::RecordingActive() const
+{
+	return obs_output_active(fileOutput);
+}
+
+bool PluginOutput::ReplayBufferActive() const
+{
+	return obs_output_active(replayBuffer);
+}
+
+/* ------------------------------------------------------------------------ */
+
 BasicOutputHandler *CreateSimpleOutputHandler(OBSBasic *main)
 {
 	return new SimpleOutput(main);
@@ -1786,4 +1920,9 @@ BasicOutputHandler *CreateSimpleOutputHandler(OBSBasic *main)
 BasicOutputHandler *CreateAdvancedOutputHandler(OBSBasic *main)
 {
 	return new AdvancedOutput(main);
+}
+
+BasicOutputHandler *CreatePluginOutputHandler(OBSBasic *main)
+{
+	return new PluginOutput(main);
 }

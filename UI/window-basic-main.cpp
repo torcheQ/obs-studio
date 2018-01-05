@@ -1351,13 +1351,17 @@ void OBSBasic::ResetOutputs()
 	ProfileScope("OBSBasic::ResetOutputs");
 
 	const char *mode = config_get_string(basicConfig, "Output", "Mode");
-	bool advOut = astrcmpi(mode, "Advanced") == 0;
 
 	if (!outputHandler || !outputHandler->Active()) {
 		outputHandler.reset();
-		outputHandler.reset(advOut ?
-			CreateAdvancedOutputHandler(this) :
-			CreateSimpleOutputHandler(this));
+
+		if (astrcmpi(mode, "Advanced") == 0) {
+			outputHandler.reset(CreateAdvancedOutputHandler(this));
+		} else if (astrcmpi(mode, "Plugin") == 0) {
+			outputHandler.reset(CreatePluginOutputHandler(this));
+		} else {
+			outputHandler.reset(CreateSimpleOutputHandler(this));
+		}
 
 		delete replayBufferButton;
 

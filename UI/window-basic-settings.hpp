@@ -93,6 +93,7 @@ private:
 	bool videoChanged = false;
 	bool hotkeysChanged = false;
 	bool advancedChanged = false;
+    bool pluginOutputChanged = false;
 	int  pageIndex = 0;
 	bool loading = true;
 	std::string savedTheme;
@@ -236,6 +237,7 @@ private:
 	void SaveVideoSettings();
 	void SaveHotkeySettings();
 	void SaveAdvancedSettings();
+    void SavePluginOutputSettings();
 	void SaveSettings();
 
 	void UpdateSimpleOutStreamDelayEstimate();
@@ -289,6 +291,7 @@ private slots:
 	void ReloadHotkeys(obs_hotkey_id ignoreKey=OBS_INVALID_HOTKEY_ID);
 	void AdvancedChanged();
 	void AdvancedChangedRestart();
+    void PluginOutputChanged();
 
 	void UpdateStreamDelayEstimate();
 

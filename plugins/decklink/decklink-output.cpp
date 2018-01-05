@@ -144,7 +144,7 @@ static obs_properties_t *decklink_output_properties(void *unused)
 	fill_out_devices(list);
 
     obs_properties_add_list(props, MODE_ID, TEXT_MODE, OBS_COMBO_TYPE_LIST, OBS_COMBO_FORMAT_INT);
-    
+
 	return props;
 }
 

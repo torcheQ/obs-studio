@@ -272,6 +272,7 @@ void OBSBasicSettings::HookWidget(QWidget *widget, const char *signal,
 #define VIDEO_CHANGED   SLOT(VideoChanged())
 #define ADV_CHANGED     SLOT(AdvancedChanged())
 #define ADV_RESTART     SLOT(AdvancedChangedRestart())
+#define PLG_CHANGED     SLOT(pluginOutputChanged())
 
 OBSBasicSettings::OBSBasicSettings(QWidget *parent)
 	: QDialog          (parent),
@@ -421,6 +422,7 @@ OBSBasicSettings::OBSBasicSettings(QWidget *parent)
 	HookWidget(ui->colorRange,           COMBO_CHANGED,  ADV_CHANGED);
 	HookWidget(ui->disableOSXVSync,      CHECK_CHANGED,  ADV_CHANGED);
 	HookWidget(ui->resetOSXVSync,        CHECK_CHANGED,  ADV_CHANGED);
+    HookWidget(ui->pluginOutputType,     COMBO_CHANGED,  PLG_CHANGED);
 #if defined(_WIN32) || defined(__APPLE__) || HAVE_PULSEAUDIO
 	HookWidget(ui->monitoringDevice,     COMBO_CHANGED,  ADV_CHANGED);
 #endif
@@ -661,6 +663,8 @@ OBSBasicSettings::OBSBasicSettings(QWidget *parent)
 			this, SLOT(AdvReplayBufferChanged()));
 	connect(ui->listWidget, SIGNAL(currentRowChanged(int)),
 			this, SLOT(SimpleRecordingEncoderChanged()));
+    connect(ui->pluginOutputType, SIGNAL(currentRowChanged(int)),
+            this, SLOT(PluginOutputChanged()));
 
 	// Get Bind to IP Addresses
 	obs_properties_t *ppts = obs_get_output_properties("rtmp_output");
@@ -1529,6 +1533,9 @@ void OBSBasicSettings::LoadSimpleOutputSettings()
 
 void OBSBasicSettings::LoadPluginOutputSettings()
 {
+    const char * pluginType = config_get_string(main->Config(), "PluginOut",
+                                                "PluginType");
+
 	const char    *type;
 	size_t        idx = 0;
 
@@ -1539,6 +1546,8 @@ void OBSBasicSettings::LoadPluginOutputSettings()
 
 		ui->pluginOutputType->addItem(qName, qType);
 	}
+
+    SetComboByValue(ui->pluginOutputType, pluginType);
 }
 
 void OBSBasicSettings::LoadAdvOutputStreamingSettings()
@@ -2585,6 +2594,8 @@ void OBSBasicSettings::LoadSettings(bool changedOnly)
 		LoadHotkeySettings();
 	if (!changedOnly || advancedChanged)
 		LoadAdvancedSettings();
+    if (!changedOnly || pluginOutputChanged)
+        LoadPluginOutputSettings();
 }
 
 void OBSBasicSettings::SaveGeneralSettings()
@@ -2846,6 +2857,11 @@ void OBSBasicSettings::SaveAdvancedSettings()
 				QT_TO_UTF8(newDevice));
 	}
 #endif
+}
+
+void OBSBasicSettings::SavePluginOutputSettings()
+{
+    SaveComboData(ui->pluginOutputType, "PluginOut", "PluginType");
 }
 
 static inline const char *OutputModeFromIdx(int idx)
@@ -3205,8 +3221,10 @@ void OBSBasicSettings::SaveSettings()
 		SaveHotkeySettings();
 	if (advancedChanged)
 		SaveAdvancedSettings();
+    if (pluginOutputChanged)
+        SavePluginOutputSettings();
 
-	if (videoChanged || advancedChanged)
+	if (videoChanged || advancedChanged  || pluginOutputChanged)
 		main->ResetVideo();
 
 	config_save_safe(main->Config(), "tmp", nullptr);
@@ -3769,6 +3787,15 @@ void OBSBasicSettings::AdvancedChanged()
 		sender()->setProperty("changed", QVariant(true));
 		EnableApplyButton(true);
 	}
+}
+
+void OBSBasicSettings::PluginOutputChanged()
+{
+    if (!loading) {
+        pluginOutputChanged = true;
+        sender()->setProperty("changed", QVariant(true));
+        EnableApplyButton(true);
+    }
 }
 
 void OBSBasicSettings::AdvOutRecCheckWarnings()
