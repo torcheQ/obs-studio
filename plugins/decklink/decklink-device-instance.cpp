@@ -336,6 +336,8 @@ void DeckLinkDeviceInstance::DisplayVideoFrame(video_scaler *scaler, video_data 
 	HRESULT                         result;
 	IDeckLinkMutableVideoFrame*     decklinkFrame = NULL;
 
+
+
 	result = output->CreateVideoFrame(1920, 1080, 1920*2, bmdFormat8BitYUV, bmdFrameFlagDefault, &decklinkFrame);
 	if (result != S_OK) {
 		blog(LOG_ERROR ,"failed to make frame 0x%X", result);

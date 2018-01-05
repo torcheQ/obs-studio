@@ -87,6 +87,8 @@ bool DeckLink::Activate(DeckLinkDevice *device, long long modeId)
 		return false;
 	}
 
+	//instance->setOutputSize();
+
 	if (!instance->StartCapture(mode)) {
 		instance = nullptr;
 		return false;

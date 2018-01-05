@@ -20,7 +20,8 @@ static void *decklink_output_create(obs_data_t *settings, obs_output_t *output)
 {
 	auto *decklinkOutput = new DeckLinkOutput(output, deviceEnum);
 
-	obs_output_update(output, settings);
+	decklinkOutput->deviceHash = obs_data_get_string(settings, DEVICE_HASH);
+	decklinkOutput->modeID = obs_data_get_int(settings, MODE_ID);
 
 	return decklinkOutput;
 }
@@ -29,19 +30,19 @@ static void decklink_output_update(void *data, obs_data_t *settings)
 {
     auto *decklink = (DeckLinkOutput *)data;
 
-    const char *hash = obs_data_get_string(settings, DEVICE_HASH);
-    long long modeID = obs_data_get_int(settings, MODE_ID);
-
-    ComPtr<DeckLinkDevice> device;
-
-    device.Set(deviceEnum->FindByHash(hash));
-
-    decklink->Activate(device, modeID);
+	decklink->deviceHash = obs_data_get_string(settings, DEVICE_HASH);
+	decklink->modeID = obs_data_get_int(settings, MODE_ID);
 }
 
 static bool decklink_output_start(void *data)
 {
 	auto *decklink = (DeckLinkOutput *)data;
+
+	ComPtr<DeckLinkDevice> device;
+
+	device.Set(deviceEnum->FindByHash(decklink->deviceHash));
+
+	decklink->Activate(device, decklink->modeID);
 
 	struct obs_video_info ovi;
 
@@ -52,10 +53,12 @@ static bool decklink_output_start(void *data)
 	from.width = ovi.output_width;
 	from.height = ovi.output_height;
 
+	DeckLinkDeviceMode *mode = device->FindOutputMode(decklink->modeID);
+
 	struct video_scale_info to = {};
 	to.format = VIDEO_FORMAT_UYVY;
-	to.width = 1920;
-	to.height = 1080;
+	to.width = mode->GetWidth();
+	to.height =  mode->GetHeight();
 
 	video_scaler_create(&decklink->scaler, &to, &from, VIDEO_SCALE_FAST_BILINEAR);
 
@@ -63,13 +66,20 @@ static bool decklink_output_start(void *data)
 		return false;
 	}
 
-
 	return true;
 }
 
 static void decklink_output_stop(void *data, uint64_t ts)
 {
 	auto *decklink = (DeckLinkOutput *)data;
+
+	obs_output_end_data_capture(decklink->GetOutput());
+
+	ComPtr<DeckLinkDevice> device;
+
+	device.Set(deviceEnum->FindByHash(decklink->deviceHash));
+
+	decklink->Deactivate();
 }
 
 static void decklink_output_raw_video(void *data, struct video_data *frame){

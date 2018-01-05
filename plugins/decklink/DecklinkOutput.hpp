@@ -32,6 +32,8 @@ class DeckLinkOutput {
 
 	public:
 	video_scaler_t *scaler;
+	const char                            *deviceHash;
+	long long                             modeID;
 
 	DeckLinkOutput(obs_output_t *output, DeckLinkDeviceDiscovery *discovery);
 	virtual ~DeckLinkOutput(void);

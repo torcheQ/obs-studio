@@ -1861,9 +1861,13 @@ bool PluginOutput::StartRecording()
 	const char * pluginType = config_get_string(main->Config(), "PluginOut",
 												"PluginType");
 
-	fileOutput = obs_output_create(pluginType, "", nullptr, nullptr);
+	OBSData pluginOutputSettings = GetDataFromJsonFile("pluginOutputProps.json");
 
-	return false;
+	fileOutput = obs_output_create(pluginType, "", pluginOutputSettings, nullptr);
+
+	obs_output_start(fileOutput);
+
+	return true;
 }
 
 bool PluginOutput::StartReplayBuffer()

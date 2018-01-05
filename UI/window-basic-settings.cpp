@@ -272,7 +272,7 @@ void OBSBasicSettings::HookWidget(QWidget *widget, const char *signal,
 #define VIDEO_CHANGED   SLOT(VideoChanged())
 #define ADV_CHANGED     SLOT(AdvancedChanged())
 #define ADV_RESTART     SLOT(AdvancedChangedRestart())
-#define PLG_CHANGED     SLOT(pluginOutputChanged())
+#define PLG_CHANGED     SLOT(PluginOutputChanged())
 
 OBSBasicSettings::OBSBasicSettings(QWidget *parent)
 	: QDialog          (parent),
@@ -663,7 +663,7 @@ OBSBasicSettings::OBSBasicSettings(QWidget *parent)
 			this, SLOT(AdvReplayBufferChanged()));
 	connect(ui->listWidget, SIGNAL(currentRowChanged(int)),
 			this, SLOT(SimpleRecordingEncoderChanged()));
-    connect(ui->pluginOutputType, SIGNAL(currentRowChanged(int)),
+    connect(ui->pluginOutputType, SIGNAL(currentIndexChanged(int)),
             this, SLOT(PluginOutputChanged()));
 
 	// Get Bind to IP Addresses
@@ -1608,6 +1608,36 @@ OBSPropertiesView *OBSBasicSettings::CreateEncoderPropertyView(
 	view->setFrameShape(QFrame::StyledPanel);
 	view->setProperty("changed", QVariant(changed));
 	QObject::connect(view, SIGNAL(Changed()), this, SLOT(OutputsChanged()));
+
+	obs_data_release(settings);
+	return view;
+}
+
+OBSPropertiesView *OBSBasicSettings::CreatePluginOutputPropertyView(
+		const char *pluginType, const char *path, bool changed)
+{
+	obs_data_t *settings = obs_data_create();
+	OBSPropertiesView *view;
+
+	if (path) {
+		char encoderJsonPath[512];
+		int ret = GetProfilePath(encoderJsonPath,
+								 sizeof(encoderJsonPath), path);
+		if (ret > 0) {
+			obs_data_t *data = obs_data_create_from_json_file_safe(
+					encoderJsonPath, "bak");
+			obs_data_apply(settings, data);
+			obs_data_release(data);
+		}
+	}
+
+	view = new OBSPropertiesView(settings,
+								 pluginType,
+								 (PropertiesReloadCallback)obs_get_output_properties,
+								 170);
+	view->setFrameShape(QFrame::StyledPanel);
+	view->setProperty("changed", QVariant(changed));
+	QObject::connect(view, SIGNAL(Changed()), this, SLOT(PluginOutputChanged()));
 
 	obs_data_release(settings);
 	return view;
@@ -2859,9 +2889,27 @@ void OBSBasicSettings::SaveAdvancedSettings()
 #endif
 }
 
+static void WriteJsonData(OBSPropertiesView *view, const char *path)
+{
+	char full_path[512];
+
+	if (!view || !WidgetChanged(view))
+		return;
+
+	int ret = GetProfilePath(full_path, sizeof(full_path), path);
+	if (ret > 0) {
+		obs_data_t *settings = view->GetSettings();
+		if (settings) {
+			obs_data_save_json_safe(settings, full_path,
+									"tmp", "bak");
+		}
+	}
+}
+
 void OBSBasicSettings::SavePluginOutputSettings()
 {
     SaveComboData(ui->pluginOutputType, "PluginOut", "PluginType");
+	WriteJsonData(pluginOutputProps, "pluginOutputProps.json");
 }
 
 static inline const char *OutputModeFromIdx(int idx)
@@ -2880,23 +2928,6 @@ static inline const char *RecTypeFromIdx(int idx)
 		return "FFmpeg";
 	else
 		return "Standard";
-}
-
-static void WriteJsonData(OBSPropertiesView *view, const char *path)
-{
-	char full_path[512];
-
-	if (!view || !WidgetChanged(view))
-		return;
-
-	int ret = GetProfilePath(full_path, sizeof(full_path), path);
-	if (ret > 0) {
-		obs_data_t *settings = view->GetSettings();
-		if (settings) {
-			obs_data_save_json_safe(settings, full_path,
-					"tmp", "bak");
-		}
-	}
 }
 
 static void SaveTrackIndex(config_t *config, const char *section,
@@ -3333,10 +3364,7 @@ void OBSBasicSettings::on_pluginOutputType_currentIndexChanged(int idx)
 
 	delete pluginOutputProps;
 
-	pluginOutputProps = new OBSPropertiesView(settings,
-			QT_TO_UTF8(pluginType),
-			(PropertiesReloadCallback)obs_get_output_properties,
-			170);
+	pluginOutputProps = CreatePluginOutputPropertyView(QT_TO_UTF8(pluginType), "pluginOutputProps.json", true);
 
 	layout->addWidget(pluginOutputProps);
 

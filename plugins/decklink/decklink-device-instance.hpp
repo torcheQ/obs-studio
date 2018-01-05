@@ -25,6 +25,8 @@ protected:
 	uint64_t                lastVideoTS = 0;
 	AudioRepacker           *audioRepacker = nullptr;
 	speaker_layout          channelFormat = SPEAKERS_STEREO;
+	long                    outputWidth;
+	long                    outputHeight;
 
 	video_data* conversion_video_data;
 

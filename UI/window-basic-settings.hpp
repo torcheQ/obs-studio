@@ -202,6 +202,9 @@ private:
 	OBSPropertiesView *CreateEncoderPropertyView(const char *encoder,
 			const char *path, bool changed = false);
 
+	OBSPropertiesView *CreatePluginOutputPropertyView(const char *pluginType,
+			const char *path, bool changed = false);
+
 	/* general */
 	void LoadLanguageList();
 	void LoadThemeList();
