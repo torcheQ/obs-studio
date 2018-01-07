@@ -92,7 +92,9 @@ static void decklink_output_raw_video(void *data, struct video_data *frame){
 
 static void decklink_output_raw_audio(void *data, struct audio_data *frames)
 {
+	auto *decklink = (DeckLinkOutput *)data;
 
+	decklink->WriteAudio(frames);
 }
 
 static bool decklink_output_device_changed(obs_properties_t *props,

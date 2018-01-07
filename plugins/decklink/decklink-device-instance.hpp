@@ -76,4 +76,5 @@ public:
 	ULONG STDMETHODCALLTYPE Release(void);
 
 	void DisplayVideoFrame(video_scaler *scaler, video_data *frame);
+	void WriteAudio(audio_data *frames);
 };

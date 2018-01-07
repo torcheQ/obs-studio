@@ -29,9 +29,12 @@ public:
 
 	void DisplayVideoFrame(video_data *pData);
 
+	void WriteAudio(audio_data *frames);
+
 	void SetSize(int width, int height);
 
 	int GetWidth();
 
 	int GetHeight();
+
 };

@@ -78,6 +78,10 @@ void DeckLinkOutput::DisplayVideoFrame(video_data *frame) {
     instance->DisplayVideoFrame(scaler, frame);
 }
 
+void DeckLinkOutput::WriteAudio(audio_data *frames) {
+    instance->WriteAudio(frames);
+}
+
 void DeckLinkOutput::SetSize(int width, int height) {
     this->width = width;
     this->height = height;

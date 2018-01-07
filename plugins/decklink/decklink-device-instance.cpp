@@ -318,12 +318,18 @@ bool DeckLinkDeviceInstance::StartOutput(DeckLinkDeviceMode *mode_)
 		return false;
 	}
 
+	const HRESULT audioResult = output->EnableAudioOutput(bmdAudioSampleRate48kHz, bmdAudioSampleType16bitInteger, 2, bmdAudioOutputStreamContinuous);
+	if (audioResult != S_OK) {
+		LOG(LOG_ERROR, "Failed to enable audio output");
+		return false;
+	}
+
 	mode = mode_;
 
 	return true;
 }
 
-bool DeckLinkDeviceInstance::StopOutput(void)
+bool DeckLinkDeviceInstance::StopOutput()
 {
 	if (mode == nullptr || output == nullptr)
 		return false;
@@ -334,13 +340,15 @@ bool DeckLinkDeviceInstance::StopOutput(void)
 
 	output->DisableVideoOutput();
 
+	output->DisableAudioOutput();
+
 	return true;
 }
 
 void DeckLinkDeviceInstance::DisplayVideoFrame(video_scaler *scaler, video_data *frame)
 {
 	HRESULT                         result;
-	IDeckLinkMutableVideoFrame*     decklinkFrame = NULL;
+	IDeckLinkMutableVideoFrame*     decklinkFrame = nullptr;
 
 	auto decklinkOutput = dynamic_cast<DeckLinkOutput*>(decklink);
 	if (decklinkOutput == nullptr) {
@@ -375,6 +383,12 @@ void DeckLinkDeviceInstance::DisplayVideoFrame(video_scaler *scaler, video_data 
 	output->DisplayVideoFrameSync(decklinkFrame);
 
 	decklinkFrame->Release();
+}
+
+void DeckLinkDeviceInstance::WriteAudio(audio_data *frames)
+{
+	uint32_t sampleFramesWritten;
+	output->WriteAudioSamplesSync(frames->data[0], frames->frames, &sampleFramesWritten);
 }
 
 #define TIME_BASE 1000000000
