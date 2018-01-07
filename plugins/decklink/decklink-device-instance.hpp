@@ -1,5 +1,7 @@
 #pragma once
 
+#define LOG(level, message, ...) blog(level, "%s: " message, "decklink", ##__VA_ARGS__)
+
 #include <obs-module.h>
 #include "decklink-device.hpp"
 #include "../../libobs/media-io/video-scaler.h"

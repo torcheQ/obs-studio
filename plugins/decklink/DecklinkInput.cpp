@@ -73,6 +73,11 @@ bool DeckLinkInput::Activate(DeckLinkDevice *device, long long modeId)
 	if (instance == nullptr)
 		return false;
 
+	if (curDevice == nullptr) {
+		LOG(LOG_ERROR, "Tried to activate an input without nullptr device.");
+		return false;
+	}
+
 	DeckLinkDeviceMode *mode = GetDevice()->FindInputMode(modeId);
 	if (mode == nullptr) {
 		instance = nullptr;

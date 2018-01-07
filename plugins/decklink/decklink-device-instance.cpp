@@ -9,9 +9,6 @@
 
 #include <sstream>
 
-#define LOG(level, message, ...) blog(level, "%s: " message, "decklink", ##__VA_ARGS__)
-		//obs_source_get_name(this->decklink->GetSource()), ##__VA_ARGS__)
-
 #ifdef _WIN32
 #define IS_WIN 1
 #else
