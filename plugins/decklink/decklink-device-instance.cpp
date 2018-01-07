@@ -1,6 +1,9 @@
 #include "decklink-device-instance.hpp"
 #include "audio-repack.hpp"
 
+#include "DecklinkInput.hpp"
+#include "DecklinkOutput.hpp"
+
 #include <util/platform.h>
 #include <util/threading.h>
 
@@ -62,7 +65,7 @@ static inline audio_repack_mode_t ConvertRepackFormat(speaker_layout format)
 	}
 }
 
-DeckLinkDeviceInstance::DeckLinkDeviceInstance(DeckLink *decklink_,
+DeckLinkDeviceInstance::DeckLinkDeviceInstance(DecklinkBase *decklink_,
 		DeckLinkDevice *device_) :
 	currentFrame(), currentPacket(), decklink(decklink_), device(device_)
 {
@@ -70,10 +73,13 @@ DeckLinkDeviceInstance::DeckLinkDeviceInstance(DeckLink *decklink_,
 	currentPacket.speakers        = SPEAKERS_STEREO;
 	currentPacket.format          = AUDIO_FORMAT_16BIT;
 
-	conversion_video_data = new video_data();
-	for (size_t i = 0; i < MAX_AV_PLANES; i++) {
-		conversion_video_data->data[i] = new uint8_t[1920 * 1080 * 2];
-		conversion_video_data->linesize[i] = 1920 * 2;
+	auto decklinkOutput = dynamic_cast<DeckLinkOutput*>(decklink_);
+	if(decklinkOutput != nullptr) {
+		conversion_video_data = new video_data();
+		for (size_t i = 0; i < MAX_AV_PLANES; i++) {
+			conversion_video_data->data[i] = new uint8_t[decklinkOutput->GetWidth() * decklinkOutput->GetHeight() * 2];
+			conversion_video_data->linesize[i] = decklinkOutput->GetWidth() * 2;
+		}
 	}
 }
 
@@ -98,7 +104,7 @@ void DeckLinkDeviceInstance::HandleAudioPacket(
 	currentPacket.frames      = frameCount;
 	currentPacket.timestamp   = timestamp;
 
-	if (decklink && !decklink->buffering) {
+	if (decklink && !static_cast<DeckLinkInput*>(decklink)->buffering) {
 		currentPacket.timestamp = os_gettime_ns();
 		currentPacket.timestamp -=
 			(uint64_t)frameCount * 1000000000ULL /
@@ -126,7 +132,7 @@ void DeckLinkDeviceInstance::HandleAudioPacket(
 	nextAudioTS = timestamp +
 		((uint64_t)frameCount * 1000000000ULL / 48000ULL) + 1;
 
-	obs_source_output_audio(decklink->GetSource(), &currentPacket);
+	obs_source_output_audio(static_cast<DeckLinkInput*>(decklink)->GetSource(), &currentPacket);
 }
 
 void DeckLinkDeviceInstance::HandleVideoFrame(
@@ -147,7 +153,7 @@ void DeckLinkDeviceInstance::HandleVideoFrame(
 	currentFrame.height      = (uint32_t)videoFrame->GetHeight();
 	currentFrame.timestamp   = timestamp;
 
-	obs_source_output_video(decklink->GetSource(), &currentFrame);
+	obs_source_output_video(static_cast<DeckLinkInput*>(decklink)->GetSource(), &currentFrame);
 }
 
 void DeckLinkDeviceInstance::FinalizeStream()
@@ -175,7 +181,7 @@ void DeckLinkDeviceInstance::SetupVideoFormat(DeckLinkDeviceMode *mode_)
 
 	currentFrame.format = ConvertPixelFormat(pixelFormat);
 
-	colorSpace = decklink->GetColorSpace();
+	colorSpace = static_cast<DeckLinkInput*>(decklink)->GetColorSpace();
 	if (colorSpace == VIDEO_CS_DEFAULT) {
 		const BMDDisplayModeFlags flags = mode_->GetDisplayModeFlags();
 		if (flags & bmdDisplayModeColorspaceRec709)
@@ -188,7 +194,7 @@ void DeckLinkDeviceInstance::SetupVideoFormat(DeckLinkDeviceMode *mode_)
 		activeColorSpace = colorSpace;
 	}
 
-	colorRange = decklink->GetColorRange();
+	colorRange = static_cast<DeckLinkInput*>(decklink)->GetColorRange();
 	currentFrame.full_range = colorRange == VIDEO_RANGE_FULL;
 
 	video_format_get_parameters(activeColorSpace, colorRange,
@@ -224,7 +230,7 @@ bool DeckLinkDeviceInstance::StartCapture(DeckLinkDeviceMode *mode_)
 		flags = bmdVideoInputEnableFormatDetection;
 	} else {
 		displayMode = mode_->GetDisplayMode();
-		pixelFormat = decklink->GetPixelFormat();
+		pixelFormat = static_cast<DeckLinkInput*>(decklink)->GetPixelFormat();
 		flags = bmdVideoInputFlagDefault;
 	}
 
@@ -237,7 +243,7 @@ bool DeckLinkDeviceInstance::StartCapture(DeckLinkDeviceMode *mode_)
 
 	SetupVideoFormat(mode_);
 
-	channelFormat = decklink->GetChannelFormat();
+	channelFormat = static_cast<DeckLinkInput*>(decklink)->GetChannelFormat();
 	currentPacket.speakers = channelFormat;
 
 	int maxdevicechannel = device->GetMaxChannel();
@@ -336,9 +342,14 @@ void DeckLinkDeviceInstance::DisplayVideoFrame(video_scaler *scaler, video_data 
 	HRESULT                         result;
 	IDeckLinkMutableVideoFrame*     decklinkFrame = NULL;
 
+	auto decklinkOutput = dynamic_cast<DeckLinkOutput*>(decklink);
+	if (decklinkOutput == nullptr) {
+		return;
+	}
 
-
-	result = output->CreateVideoFrame(1920, 1080, 1920*2, bmdFormat8BitYUV, bmdFrameFlagDefault, &decklinkFrame);
+	result = output->CreateVideoFrame(decklinkOutput->GetWidth(), decklinkOutput->GetHeight(),
+									  decklinkOutput->GetWidth()*2,
+									  bmdFormat8BitYUV, bmdFrameFlagDefault, &decklinkFrame);
 	if (result != S_OK) {
 		blog(LOG_ERROR ,"failed to make frame 0x%X", result);
 		return;
@@ -353,7 +364,7 @@ void DeckLinkDeviceInstance::DisplayVideoFrame(video_scaler *scaler, video_data 
 
 	uint8_t *outData = conversion_video_data->data[0];
 
-	uint32_t wordsRemaining = (1920 * 1080) * 2;
+	uint32_t wordsRemaining = (decklinkOutput->GetWidth() * decklinkOutput->GetHeight()) * 2;
 
 	while (wordsRemaining > 0)
 	{

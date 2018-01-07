@@ -2,12 +2,12 @@
 
 #include "const.h"
 
-#include "decklink.hpp"
+#include "DecklinkInput.hpp"
 #include "decklink-device.hpp"
 #include "decklink-device-discovery.hpp"
 #include "decklink-devices.hpp"
 
-static void decklink_enable_buffering(DeckLink *decklink, bool enabled)
+static void decklink_enable_buffering(DeckLinkInput *decklink, bool enabled)
 {
 	obs_source_t *source = decklink->GetSource();
 	obs_source_set_async_unbuffered(source, !enabled);
@@ -16,7 +16,7 @@ static void decklink_enable_buffering(DeckLink *decklink, bool enabled)
 
 static void *decklink_create(obs_data_t *settings, obs_source_t *source)
 {
-	DeckLink *decklink = new DeckLink(source, deviceEnum);
+	DeckLinkInput *decklink = new DeckLinkInput(source, deviceEnum);
 
 	obs_source_set_async_decoupled(source, true);
 	decklink_enable_buffering(decklink,
@@ -28,13 +28,13 @@ static void *decklink_create(obs_data_t *settings, obs_source_t *source)
 
 static void decklink_destroy(void *data)
 {
-	DeckLink *decklink = (DeckLink *)data;
+	DeckLinkInput *decklink = (DeckLinkInput *)data;
 	delete decklink;
 }
 
 static void decklink_update(void *data, obs_data_t *settings)
 {
-	DeckLink *decklink = (DeckLink *)data;
+	DeckLinkInput *decklink = (DeckLinkInput *)data;
 	const char *hash = obs_data_get_string(settings, DEVICE_HASH);
 	long long id = obs_data_get_int(settings, MODE_ID);
 	BMDPixelFormat pixelFormat = (BMDPixelFormat)obs_data_get_int(settings,

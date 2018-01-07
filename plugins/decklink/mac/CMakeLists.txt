@@ -31,7 +31,8 @@ set(mac-decklink_HEADERS
 		../const.h
 		../DecklinkOutput.hpp
 		../platform.hpp
-		../decklink.hpp
+        ../DecklinkInput.hpp
+		../DecklinkBase.h
 		../decklink-device-instance.hpp
 		../decklink-device-discovery.hpp
 		../decklink-device.hpp
@@ -46,7 +47,8 @@ set(mac-decklink_SOURCES
 		../decklink-output.cpp
 		../decklink-source.cpp
 		../DecklinkOutput.cpp
-		../decklink.cpp
+        ../DecklinkInput.cpp
+		../DecklinkBase.cpp
 		../decklink-device-instance.cpp
 		../decklink-device-discovery.cpp
 		../decklink-device.cpp

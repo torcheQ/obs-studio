@@ -1,6 +1,5 @@
 #pragma once
 
-#include "decklink.hpp"
 #include "decklink-device-mode.hpp"
 
 #include <map>

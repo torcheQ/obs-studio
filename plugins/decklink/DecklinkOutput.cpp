@@ -1,12 +1,9 @@
 #include "DecklinkOutput.hpp"
-#include "decklink-device-discovery.hpp"
-#include "decklink-device-instance.hpp"
-#include "decklink-device-mode.hpp"
 
 #include <util/threading.h>
 
 DeckLinkOutput::DeckLinkOutput(obs_output_t *output, DeckLinkDeviceDiscovery *discovery_) :
-        discovery(discovery_), output(output) {
+        DecklinkBase(discovery_), output(output) {
     discovery->AddCallback(DeckLinkOutput::DevicesChanged, this);
 }
 
@@ -15,41 +12,11 @@ DeckLinkOutput::~DeckLinkOutput(void) {
     Deactivate();
 }
 
-DeckLinkDevice *DeckLinkOutput::GetDevice() const {
-    return instance ? instance->GetDevice() : nullptr;
-}
-
 void DeckLinkOutput::DevicesChanged(void *param, DeckLinkDevice *device, bool added) {
-    DeckLinkOutput *decklink = reinterpret_cast<DeckLinkOutput *>(param);
+    auto *decklink = reinterpret_cast<DeckLinkOutput *>(param);
     std::lock_guard<std::recursive_mutex> lock(decklink->deviceMutex);
 
     blog(LOG_DEBUG, "%s", device->GetHash().c_str());
-
-    /*obs_source_update_properties(decklink->output);
-
-    if (added && !decklink->instance) {
-        const char *hash;
-        long long mode;
-        obs_data_t *settings;
-
-        settings = obs_source_get_settings(decklink->source);
-        hash = obs_data_get_string(settings, "device_hash");
-        mode = obs_data_get_int(settings, "mode_id");
-        obs_data_release(settings);
-
-        if (device->GetHash().compare(hash) == 0) {
-            if (!decklink->activateRefs)
-                return;
-            if (decklink->Activate(device, mode))
-                os_atomic_dec_long(&decklink->activateRefs);
-        }
-
-    } else if (!added && decklink->instance) {
-        if (decklink->instance->GetDevice() == device) {
-            os_atomic_inc_long(&decklink->activateRefs);
-            decklink->Deactivate();
-        }
-    }*/
 }
 
 bool DeckLinkOutput::Activate(DeckLinkDevice *device, long long modeId) {
@@ -73,7 +40,7 @@ bool DeckLinkOutput::Activate(DeckLinkDevice *device, long long modeId) {
         instance->StopOutput();
 
     if (!same)
-        instance.Set(new DeckLinkDeviceInstance(nullptr, device)); // TODO: pass a real instance here (inheritance?)
+        instance.Set(new DeckLinkDeviceInstance(this, device));
 
     if (instance == nullptr)
         return false;
@@ -109,4 +76,19 @@ obs_output_t *DeckLinkOutput::GetOutput(void) const {
 
 void DeckLinkOutput::DisplayVideoFrame(video_data *frame) {
     instance->DisplayVideoFrame(scaler, frame);
+}
+
+void DeckLinkOutput::SetSize(int width, int height) {
+    this->width = width;
+    this->height = height;
+}
+
+int DeckLinkOutput::GetWidth()
+{
+    return width;
+}
+
+int DeckLinkOutput::GetHeight()
+{
+    return height;
 }

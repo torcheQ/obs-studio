@@ -42,8 +42,6 @@ static bool decklink_output_start(void *data)
 
 	device.Set(deviceEnum->FindByHash(decklink->deviceHash));
 
-	decklink->Activate(device, decklink->modeID);
-
 	struct obs_video_info ovi;
 
 	obs_get_video_info(&ovi);
@@ -60,7 +58,11 @@ static bool decklink_output_start(void *data)
 	to.width = mode->GetWidth();
 	to.height =  mode->GetHeight();
 
+	decklink->SetSize(mode->GetWidth(), mode->GetHeight());
+
 	video_scaler_create(&decklink->scaler, &to, &from, VIDEO_SCALE_FAST_BILINEAR);
+
+	decklink->Activate(device, decklink->modeID);
 
 	if (!obs_output_begin_data_capture(decklink->GetOutput(), 0)) {
 		return false;

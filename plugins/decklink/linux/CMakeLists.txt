@@ -28,7 +28,7 @@ set(linux-decklink_HEADERS
 	../const.h
 	../DecklinkOutput.hpp
         ../platform.hpp
-	../decklink.hpp
+        ../DecklinkInput.hpp
 	../decklink-device-instance.hpp
 	../decklink-device-discovery.hpp
 	../decklink-device.hpp
@@ -43,7 +43,7 @@ set(linux-decklink_SOURCES
 	../decklink-source.cpp
 	../decklink-output.cpp
 	../DecklinkOutput.cpp
-        ../decklink.cpp
+        ../DecklinkInput.cpp
 	../decklink-device-instance.cpp
 	../decklink-device-discovery.cpp
 	../decklink-device.cpp

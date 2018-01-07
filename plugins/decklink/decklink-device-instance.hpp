@@ -1,15 +1,17 @@
 #pragma once
 
+#include <obs-module.h>
 #include "decklink-device.hpp"
 #include "../../libobs/media-io/video-scaler.h"
 
 class AudioRepacker;
+class DecklinkBase;
 
 class DeckLinkDeviceInstance : public IDeckLinkInputCallback {
 protected:
 	struct obs_source_frame currentFrame;
 	struct obs_source_audio currentPacket;
-	DeckLink                *decklink = nullptr;
+	DecklinkBase            *decklink = nullptr;
 	DeckLinkDevice          *device = nullptr;
 	DeckLinkDeviceMode      *mode = nullptr;
 	BMDDisplayMode          displayMode = bmdModeNTSC;
@@ -39,7 +41,7 @@ protected:
 			const uint64_t timestamp);
 
 public:
-	DeckLinkDeviceInstance(DeckLink *decklink, DeckLinkDevice *device);
+	DeckLinkDeviceInstance(DecklinkBase *decklink, DeckLinkDevice *device);
 	virtual ~DeckLinkDeviceInstance();
 
 	inline DeckLinkDevice *GetDevice() const {return device;}
