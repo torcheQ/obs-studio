@@ -2917,7 +2917,11 @@ static void WriteJsonData(OBSPropertiesView *view, const char *path)
 void OBSBasicSettings::SavePluginOutputSettings()
 {
     SaveComboData(ui->pluginOutputType, "PluginOut", "PluginType");
-	WriteJsonData(pluginOutputProps, "pluginOutputProps.json");
+
+	QString pluginType = ui->pluginOutputType->itemData(ui->pluginOutputType->currentIndex()).toString();
+	QString pluginName = pluginType + "_pluginOutputProps.json";
+
+	WriteJsonData(pluginOutputProps, QT_TO_UTF8(pluginName));
 }
 
 static inline const char *OutputModeFromIdx(int idx)
@@ -3372,7 +3376,9 @@ void OBSBasicSettings::on_pluginOutputType_currentIndexChanged(int idx)
 
 	delete pluginOutputProps;
 
-	pluginOutputProps = CreatePluginOutputPropertyView(QT_TO_UTF8(pluginType), "pluginOutputProps.json", true);
+	QString pluginName = pluginType + "_pluginOutputProps.json";
+
+	pluginOutputProps = CreatePluginOutputPropertyView(QT_TO_UTF8(pluginType), QT_TO_UTF8(pluginName), true);
 
 	layout->addWidget(pluginOutputProps);
 

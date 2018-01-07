@@ -1858,12 +1858,12 @@ bool PluginOutput::StartStreaming(obs_service_t *service)
 
 bool PluginOutput::StartRecording()
 {
-	const char * pluginType = config_get_string(main->Config(), "PluginOut",
-												"PluginType");
+	std::string pluginType(config_get_string(main->Config(), "PluginOut",
+												   "PluginType"));
 
-	OBSData pluginOutputSettings = GetDataFromJsonFile("pluginOutputProps.json");
+	OBSData pluginOutputSettings = GetDataFromJsonFile((pluginType + "_pluginOutputProps.json").c_str());
 
-	fileOutput = obs_output_create(pluginType, "", pluginOutputSettings, nullptr);
+	fileOutput = obs_output_create(pluginType.c_str(), "", pluginOutputSettings, nullptr);
 
 	obs_output_start(fileOutput);
 
