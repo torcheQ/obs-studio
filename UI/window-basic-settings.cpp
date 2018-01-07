@@ -1536,10 +1536,18 @@ void OBSBasicSettings::LoadPluginOutputSettings()
     const char * pluginType = config_get_string(main->Config(), "PluginOut",
                                                 "PluginType");
 
+	ui->pluginOutputType->clear();
+
 	const char    *type;
 	size_t        idx = 0;
 
 	while (obs_enum_output_types(idx++, &type)) {
+		int flags = obs_output_get_flags(type);
+
+		if ((flags & OBS_OUTPUT_USER_VISIBLE) == 0) {
+			continue;
+		}
+
 		const char *name = obs_output_get_display_name(type);
 		QString qName = QT_UTF8(name);
 		QString qType = QT_UTF8(type);

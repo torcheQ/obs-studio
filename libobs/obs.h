@@ -1381,6 +1381,8 @@ EXPORT obs_data_t *obs_sceneitem_get_private_settings(obs_sceneitem_t *item);
 
 EXPORT const char *obs_output_get_display_name(const char *id);
 
+EXPORT int obs_output_get_flags(const char *id);
+
 /**
  * Creates an output.
  *

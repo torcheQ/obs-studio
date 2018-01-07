@@ -61,7 +61,7 @@ bool DeckLinkOutput::Activate(DeckLinkDevice *device, long long modeId) {
     return true;
 }
 
-void DeckLinkOutput::Deactivate(void) {
+void DeckLinkOutput::Deactivate() {
     std::lock_guard<std::recursive_mutex> lock(deviceMutex);
     if (instance)
         instance->StopOutput();
@@ -70,7 +70,7 @@ void DeckLinkOutput::Deactivate(void) {
     os_atomic_dec_long(&activateRefs);
 }
 
-obs_output_t *DeckLinkOutput::GetOutput(void) const {
+obs_output_t *DeckLinkOutput::GetOutput() const {
     return output;
 }
 

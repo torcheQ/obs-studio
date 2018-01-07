@@ -71,6 +71,12 @@ const char *obs_output_get_display_name(const char *id)
 	return (info != NULL) ? info->get_name(info->type_data) : NULL;
 }
 
+int obs_output_get_flags(const char *id)
+{
+	const struct obs_output_info *info = find_output(id);
+	return (info != NULL) ? info->flags : 0;
+}
+
 static const char *output_signals[] = {
 	"void start(ptr output)",
 	"void stop(ptr output, int code)",

@@ -169,7 +169,7 @@ struct obs_output_info create_decklink_output_info() {
 	struct obs_output_info decklink_output_info = {};
 
 	decklink_output_info.id             = "decklink_output";
-	decklink_output_info.flags          = OBS_OUTPUT_AV;
+    decklink_output_info.flags          = OBS_OUTPUT_AV | OBS_OUTPUT_USER_VISIBLE;
 	decklink_output_info.get_name       = decklink_output_get_name;
 	decklink_output_info.create         = decklink_output_create;
 	decklink_output_info.destroy        = decklink_output_destroy;

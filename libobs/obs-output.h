@@ -21,12 +21,13 @@
 extern "C" {
 #endif
 
-#define OBS_OUTPUT_VIDEO       (1<<0)
-#define OBS_OUTPUT_AUDIO       (1<<1)
-#define OBS_OUTPUT_AV          (OBS_OUTPUT_VIDEO | OBS_OUTPUT_AUDIO)
-#define OBS_OUTPUT_ENCODED     (1<<2)
-#define OBS_OUTPUT_SERVICE     (1<<3)
-#define OBS_OUTPUT_MULTI_TRACK (1<<4)
+#define OBS_OUTPUT_VIDEO        (1<<0)
+#define OBS_OUTPUT_AUDIO        (1<<1)
+#define OBS_OUTPUT_AV           (OBS_OUTPUT_VIDEO | OBS_OUTPUT_AUDIO)
+#define OBS_OUTPUT_ENCODED      (1<<2)
+#define OBS_OUTPUT_SERVICE      (1<<3)
+#define OBS_OUTPUT_MULTI_TRACK  (1<<4)
+#define OBS_OUTPUT_USER_VISIBLE (1<<5)
 
 struct encoder_packet;
 
