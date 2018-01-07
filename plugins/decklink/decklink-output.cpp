@@ -64,6 +64,12 @@ static bool decklink_output_start(void *data)
 
 	decklink->Activate(device, decklink->modeID);
 
+	audio_convert_info conversion{};
+	conversion.format = AUDIO_FORMAT_16BIT;
+	conversion.speakers = SPEAKERS_STEREO;
+
+	obs_output_set_audio_conversion(decklink->GetOutput(), &conversion);
+
 	if (!obs_output_begin_data_capture(decklink->GetOutput(), 0)) {
 		return false;
 	}
