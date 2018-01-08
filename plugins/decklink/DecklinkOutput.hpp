@@ -15,7 +15,6 @@ protected:
 							   bool added);
 
 public:
-	video_scaler_t *scaler;
 	const char                            *deviceHash;
 	long long                             modeID;
 

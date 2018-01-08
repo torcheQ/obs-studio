@@ -69,15 +69,6 @@ DeckLinkDeviceInstance::DeckLinkDeviceInstance(DecklinkBase *decklink_,
 	currentPacket.samples_per_sec = 48000;
 	currentPacket.speakers        = SPEAKERS_STEREO;
 	currentPacket.format          = AUDIO_FORMAT_16BIT;
-
-	auto decklinkOutput = dynamic_cast<DeckLinkOutput*>(decklink_);
-	if(decklinkOutput != nullptr) {
-		conversion_video_data = new video_data();
-		for (size_t i = 0; i < MAX_AV_PLANES; i++) {
-			conversion_video_data->data[i] = new uint8_t[decklinkOutput->GetWidth() * decklinkOutput->GetHeight() * 2];
-			conversion_video_data->linesize[i] = decklinkOutput->GetWidth() * 2;
-		}
-	}
 }
 
 DeckLinkDeviceInstance::~DeckLinkDeviceInstance()
@@ -342,7 +333,7 @@ bool DeckLinkDeviceInstance::StopOutput()
 	return true;
 }
 
-void DeckLinkDeviceInstance::DisplayVideoFrame(video_scaler *scaler, video_data *frame)
+void DeckLinkDeviceInstance::DisplayVideoFrame(video_data *frame)
 {
 	HRESULT                         result;
 	IDeckLinkMutableVideoFrame*     decklinkFrame = nullptr;
@@ -360,14 +351,10 @@ void DeckLinkDeviceInstance::DisplayVideoFrame(video_scaler *scaler, video_data 
 		return;
 	}
 
-	bool success = video_scaler_scale(scaler, conversion_video_data->data, conversion_video_data->linesize,
-								 (const uint8_t * const*)frame->data,
-								 frame->linesize);
-
 	uint8_t * nextWord;
 	decklinkFrame->GetBytes((void**)&nextWord);
 
-	uint8_t *outData = conversion_video_data->data[0];
+	uint8_t *outData = frame->data[0];
 
 	uint32_t wordsRemaining = (decklinkOutput->GetWidth() * decklinkOutput->GetHeight()) * 2;
 

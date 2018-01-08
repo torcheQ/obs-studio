@@ -29,10 +29,6 @@ protected:
 	uint64_t                lastVideoTS = 0;
 	AudioRepacker           *audioRepacker = nullptr;
 	speaker_layout          channelFormat = SPEAKERS_STEREO;
-	long                    outputWidth;
-	long                    outputHeight;
-
-	video_data* conversion_video_data;
 
 	void FinalizeStream();
 	void SetupVideoFormat(DeckLinkDeviceMode *mode_);
@@ -77,6 +73,6 @@ public:
 	HRESULT STDMETHODCALLTYPE QueryInterface(REFIID iid, LPVOID *ppv);
 	ULONG STDMETHODCALLTYPE Release(void);
 
-	void DisplayVideoFrame(video_scaler *scaler, video_data *frame);
+	void DisplayVideoFrame(video_data *frame);
 	void WriteAudio(audio_data *frames);
 };
