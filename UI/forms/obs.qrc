@@ -28,4 +28,7 @@
     <file>images/settings/network-bluetooth.png</file>
     <file>images/settings/preferences-desktop-keyboard-shortcuts.png</file>
   </qresource>
+  <qresource prefix="/ui">
+    <file>../settings/settings.qml</file>
+  </qresource>
 </RCC>

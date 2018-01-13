@@ -34,7 +34,8 @@ else()
 	set(_lib_suffix 32)
 endif()
 
-find_package(Qt5Widgets ${FIND_MODE})
+
+find_package(Qt5 COMPONENTS Widgets Qml Quick ${FIND_MODE})
 find_package(FFmpeg REQUIRED COMPONENTS avcodec avutil avformat)
 
 if(NOT Qt5Widgets_FOUND)
@@ -265,6 +266,8 @@ endif()
 target_link_libraries(obs
 	libobs
 	Qt5::Widgets
+	Qt5::Qml
+	Qt5::Quick
 	obs-frontend-api
 	${FFMPEG_LIBRARIES}
 	${LIBCURL_LIBRARIES}

@@ -27,6 +27,7 @@
 #include <QDesktopWidget>
 #include <QRect>
 #include <QScreen>
+#include <QQuickView>
 
 #include <util/dstr.h>
 #include <util/util.hpp>
@@ -3436,9 +3437,13 @@ void OBSBasic::on_actionRemux_triggered()
 
 void OBSBasic::on_action_Settings_triggered()
 {
-	OBSBasicSettings settings(this);
+	/*OBSBasicSettings settings(this);
 	settings.exec();
-	SystemTray(false);
+	SystemTray(false);*/
+
+	QQuickView *view = new QQuickView();
+	view->setSource(QUrl(QUrl("qrc:/ui/settings/settings.qml")));
+	view->show();
 }
 
 void OBSBasic::on_actionAdvAudioProperties_triggered()
