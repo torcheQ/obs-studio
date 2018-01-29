@@ -279,6 +279,7 @@ if (APPLE)
 		"/usr/local/Cellar/python3/3.6.4/Frameworks/Python.framework/Versions/3.6/lib/"
 		"/Library/Frameworks/Python.framework/Versions/3.6/lib/"
 		"/opt/local/Library/Frameworks/Python.framework/Versions/3.6/lib/"
+		"../data/obs-scripting/obslua.so"
 	)
 endif()
 
