@@ -27,6 +27,7 @@
 #include <QDesktopWidget>
 #include <QRect>
 #include <QScreen>
+#include <QStyleFactory>
 
 #include <util/dstr.h>
 #include <util/util.hpp>
@@ -152,6 +153,10 @@ OBSBasic::OBSBasic(QWidget *parent)
 	copyActionsDynamicProperties();
 
 	ui->sources->setItemDelegate(new VisibilityItemDelegate(ui->sources));
+
+#if defined(__APPLE__)
+	App()->setStyle(QStyleFactory::create("macintosh"));
+#endif
 
 	char styleSheetPath[512];
 	int ret = GetProfilePath(styleSheetPath, sizeof(styleSheetPath),
