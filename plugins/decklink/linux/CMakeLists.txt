@@ -21,19 +21,27 @@ set(linux-decklink-sdk_SOURCES
 	)
 
 set(linux-decklink_HEADERS
+	../decklink-devices.hpp
+	../const.h
+	../DecklinkOutput.hpp
 	../platform.hpp
-	../decklink.hpp
+	../DecklinkInput.hpp
+	../DecklinkBase.h
 	../decklink-device-instance.hpp
 	../decklink-device-discovery.hpp
 	../decklink-device.hpp
 	../decklink-device-mode.hpp
 	../audio-repack.h
-	../audio-repack.hpp
-	)
+	../audio-repack.hpp)
 
 set(linux-decklink_SOURCES
 	../plugin-main.cpp
-	../decklink.cpp
+	../decklink-devices.cpp
+	../decklink-source.cpp
+	../decklink-output.cpp
+	../DecklinkOutput.cpp
+	../DecklinkInput.cpp
+	../DecklinkBase.cpp
 	../decklink-device-instance.cpp
 	../decklink-device-discovery.cpp
 	../decklink-device.cpp
