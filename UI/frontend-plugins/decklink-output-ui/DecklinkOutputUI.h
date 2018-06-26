@@ -13,6 +13,7 @@ private:
 public slots:
 	void StartOutput();
 	void StopOutput();
+	void PropertiesChanged();
 
 public:
 	std::unique_ptr<Ui_Output> ui;

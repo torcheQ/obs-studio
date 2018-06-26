@@ -73,9 +73,21 @@ void addOutputUI(void)
 	action->connect(action, &QAction::triggered, cb);
 }
 
+static void OBSEvent(enum obs_frontend_event event, void *)
+{
+	if (event == OBS_FRONTEND_EVENT_FINISHED_LOADING) {
+		OBSData settings = load_settings();
+
+		if (settings && obs_data_get_bool(settings, "auto_start"))
+			output_start();
+	}
+}
+
 bool obs_module_load(void)
 {
 	addOutputUI();
+
+	obs_frontend_add_event_callback(OBSEvent, nullptr);
 
 	return true;
 }

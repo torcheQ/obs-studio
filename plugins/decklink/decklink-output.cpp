@@ -208,6 +208,8 @@ static obs_properties_t *decklink_output_properties(void *unused)
 	obs_properties_add_list(props,
 			MODE_ID, TEXT_MODE, OBS_COMBO_TYPE_LIST, OBS_COMBO_FORMAT_INT);
 
+	obs_properties_add_bool(props, AUTO_START, TEXT_AUTO_START);
+
 	return props;
 }
 

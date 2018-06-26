@@ -40,6 +40,8 @@ void DecklinkOutputUI::SetupPropertiesView()
 
 	ui->propertiesLayout->addWidget(propertiesView);
 	obs_data_release(settings);
+
+	connect(propertiesView, SIGNAL(Changed()), this, SLOT(PropertiesChanged()));
 }
 
 void DecklinkOutputUI::SaveSettings()
@@ -65,4 +67,9 @@ void DecklinkOutputUI::StartOutput()
 void DecklinkOutputUI::StopOutput()
 {
 	output_stop();
+}
+
+void DecklinkOutputUI::PropertiesChanged()
+{
+	SaveSettings();
 }
