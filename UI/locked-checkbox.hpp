@@ -1,3 +1,5 @@
+#pragma once
+
 #include <QCheckBox>
 #include <QPixmap>
 
@@ -10,7 +12,7 @@ class LockedCheckBox : public QCheckBox {
 	QPixmap unlockedImage;
 
 public:
-	LockedCheckBox();
+	LockedCheckBox(QWidget *parent = 0);
 
 protected:
 	void paintEvent(QPaintEvent *event) override;
